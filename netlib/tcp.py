@@ -1,3 +1,4 @@
+from __future__ import print_function
 import select, socket, threading, sys, time, traceback
 from OpenSSL import SSL
 import certutils
@@ -94,7 +95,7 @@ class Writer(_FileLike):
         if hasattr(self.o, "flush"):
             try:
                 self.o.flush()
-            except (socket.error, IOError), v:
+            except (socket.error, IOError) as v:
                 raise NetLibDisconnect(str(v))
 
     def write(self, v):
@@ -110,7 +111,7 @@ class Writer(_FileLike):
                     r = self.o.write(v)
                     self.add_log(v[:r])
                     return r
-            except (SSL.Error, socket.error), v:
+            except (SSL.Error, socket.error) as v:
                 raise NetLibDisconnect(str(v))
 
 
@@ -142,7 +143,7 @@ class Reader(_FileLike):
                 raise NetLibDisconnect
             except SSL.SysCallError:
                 raise NetLibDisconnect
-            except SSL.Error, v:
+            except SSL.Error as v:
                 raise NetLibSSLError(v.message)
             self.first_byte_timestamp = self.first_byte_timestamp or time.time()
             if not data:
@@ -194,7 +195,7 @@ class TCPClient:
             try:
                 context.use_privatekey_file(cert)
                 context.use_certificate_file(cert)
-            except SSL.Error, v:
+            except SSL.Error as v:
                 raise NetLibError("SSL client certificate error: %s"%str(v))
         self.connection = SSL.Connection(context, self.connection)
         self.ssl_established = True
@@ -203,7 +204,7 @@ class TCPClient:
         self.connection.set_connect_state()
         try:
             self.connection.do_handshake()
-        except SSL.Error, v:
+        except SSL.Error as v:
             raise NetLibError("SSL handshake error: %s"%str(v))
         self.cert = certutils.SSLCert(self.connection.get_peer_certificate())
         self.rfile.set_descriptor(self.connection)
@@ -218,7 +219,7 @@ class TCPClient:
             connection.connect((addr, self.port))
             self.rfile = Reader(connection.makefile('rb', self.rbufsize))
             self.wfile = Writer(connection.makefile('wb', self.wbufsize))
-        except (socket.error, IOError), err:
+        except (socket.error, IOError) as err:
             raise NetLibError('Error connecting to "%s": %s' % (self.host, err))
         self.connection = connection
 
@@ -308,7 +309,7 @@ class BaseHandler:
         self.connection.set_accept_state()
         try:
             self.connection.do_handshake()
-        except SSL.Error, v:
+        except SSL.Error as v:
             raise NetLibError("SSL handshake error: %s"%str(v))
         self.rfile.set_descriptor(self.connection)
         self.wfile.set_descriptor(self.connection)
@@ -378,7 +379,7 @@ class TCPServer:
             while not self.__shutdown_request:
                 try:
                     r, w, e = select.select([self.socket], [], [], poll_interval)
-                except select.error, ex:
+                except select.error as ex:
                         if ex[0] == 4:
                             continue
                         else:
@@ -409,10 +410,10 @@ class TCPServer:
         # none.
         if traceback:
             exc = traceback.format_exc()
-            print >> fp, '-'*40
-            print >> fp, "Error in processing of request from %s:%s"%client_address
-            print >> fp, exc
-            print >> fp, '-'*40
+            print('-'*40, file=fp)
+            print("Error in processing of request from %s:%s"%client_address, file=fp)
+            print(exc, file=fp)
+            print('-'*40, file=fp)
 
     def handle_connection(self, request, client_address): # pragma: no cover
         """

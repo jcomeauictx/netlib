@@ -9,8 +9,8 @@ else:
     port = 443
 
 cert =  certutils.get_remote_cert(sys.argv[1], port, None)
-print "CN:", cert.cn
+print("CN:", cert.cn)
 if cert.altnames:
-    print "SANs:", 
+    print("SANs:", end=' ')
     for i in cert.altnames:
-        print "\t", i
+        print("\t", i)
