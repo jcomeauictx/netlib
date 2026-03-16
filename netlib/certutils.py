@@ -33,7 +33,7 @@ def create_ca():
       OpenSSL.crypto.X509Extension(b"subjectKeyIdentifier", False, b"hash",
                                    subject=ca),
       ])
-    ca.sign(key, b"sha1")
+    ca.sign(key, "sha1")
     return key, ca
 
 
