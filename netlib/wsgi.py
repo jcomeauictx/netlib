@@ -112,7 +112,7 @@ class WSGIAdaptor:
             if exc_info:
                 try:
                     if state["headers_sent"]:
-                        raise exc_info[0], exc_info[1], exc_info[2]
+                        raise (exc_info[0], exc_info[1], exc_info[2])
                 finally:
                     exc_info = None
             elif state["status"]:
