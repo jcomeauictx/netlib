@@ -1,6 +1,15 @@
-from distutils.core import setup
-import fnmatch, os.path
+# this version is for alpine 3.14.3/iSH (shell app for iPhone with emulator)
+# it comes with python3.9.16
+# python2.7.18 is available for installation
+from distutils.core import setup, setup_keywords
+import fnmatch, os, re, logging
 from netlib import version
+# python3 compatibility shims
+try:
+    file(os.devnull)
+except NameError:
+    file = open
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 
 def _fnmatch(name, patternList):
     for i in patternList:
@@ -67,7 +76,7 @@ def findPackages(path, dataExclude=[]):
 
 long_description = file("README").read()
 packages, package_data = findPackages("netlib")
-setup(
+setup_args = dict(
         name = "netlib",
         version = version.VERSION,
         description = "A collection of network utilities used by pathod and mitmproxy.",
@@ -90,3 +99,17 @@ setup(
         ],
         install_requires=["pyasn1>0.1.2", "pyopenssl>=0.12"],
 )
+# shim for older versions of distutils like iSH's
+if 'install_requires' not in setup_keywords:
+    setup_args['requires'] = setup_args.pop('install_requires')
+    logging.debug('before: requires: %s', setup_args['requires'])
+    for index in range(len(setup_args['requires'])):
+        requirement = setup_args['requires'][index]
+        parts = re.split('([<>!=])', requirement, maxsplit=1)
+        logging.debug('parts: %s', parts)
+        if len(parts) > 1:
+            name = parts[0] + ' (' + ''.join(parts[1:]) + ')'
+            setup_args['requires'][index] = name
+    logging.debug('after: requires: %s', setup_args['requires'])
+setup(**setup_args)
+# vim: tabstop=8 shiftwidth=4 softtabstop=4 expandtabs
