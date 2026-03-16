@@ -1,5 +1,8 @@
 import binascii
-import contrib.md5crypt as md5crypt
+try:
+    import contrib.md5crypt as md5crypt
+except ImportError:
+    from .contrib import md5crypt  # python3
 import http
 
 

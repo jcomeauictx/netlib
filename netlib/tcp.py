@@ -1,7 +1,10 @@
 from __future__ import print_function
 import select, socket, threading, sys, time, traceback
 from OpenSSL import SSL
-import certutils
+try:
+    import certutils
+except ImportError:
+    from . import certutils  # python3 syntax
 
 SSLv2_METHOD = SSL.SSLv2_METHOD
 SSLv3_METHOD = SSL.SSLv3_METHOD

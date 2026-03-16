@@ -1,5 +1,12 @@
-import cStringIO, urllib, time, traceback
-import odict
+import urllib, time, traceback
+try:
+    import cStringIO
+except ImportError:
+    from io import BytesIO as cStringIO  # python3
+try:
+    import odict
+except ImportError:
+    from . import odict
 
 
 class ClientConn:

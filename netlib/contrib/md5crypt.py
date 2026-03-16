@@ -9,7 +9,10 @@
 
 # This port adds no further stipulations.  I forfeit any copyright interest.
 
-import md5
+try:
+    import md5
+except ImportError:
+    from hashlib import md5  # python3
 
 def md5crypt(password, salt, magic='$1$'):
     # /* The password first, since that is what is most unknown */ /* Then our magic string */ /* Then the raw salt */

@@ -1,5 +1,12 @@
-import string, urlparse, binascii
-import odict, utils
+import string, binascii
+try:
+    import odict, utils
+except ImportError:
+    from . import odict, utils  # python3 syntax
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse  # python3
 
 class HttpError(Exception):
     def __init__(self, code, msg):
