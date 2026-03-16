@@ -31,7 +31,7 @@ $(HOME)/.abuild: | /etc/alpine-release
 pylint: $(LINT)
 pip-install: .installed/py3-pip
 	pip --verbose install --force-reinstall \
-	 git+https://github.com/jcomeauictx/netlib@$(PACKAGE)-ish
+	 git+https://github.com/jcomeauictx/$(PACKAGE)@alpine-ish
 .installed/%-dev .installed/%-base: .installed
 	sudo apk add $(@F)
 	touch $@
