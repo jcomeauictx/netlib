@@ -3,12 +3,13 @@ WHICH := type -p
 PACKAGE := $(notdir $(PWD))
 SCRIPTS := $(shell find . -type f -name '*.py')
 LINT := $(SCRIPTS:.py=.pylint)
-default: pip-install
+default: install
+	mitmdump --version
 install: setup.py build \
  .installed/libxslt-dev .installed/libxml2-dev .installed/gcc \
  .installed/python3-dev .installed/py3-libxml2 .installed/musl-dev \
  .installed/py3-pillow .installed/openssl-dev .installed/libffi-dev \
- .installed/build-base
+ .installed/build-base .installed/py3-flask .installed/py3-urwid
 	sudo python3 $< $@
 build: setup.py clean .FORCE | .installed/python3
 	python3 $< $@
