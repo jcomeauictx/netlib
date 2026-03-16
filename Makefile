@@ -3,6 +3,7 @@ WHICH := type -p
 PACKAGE := $(notdir $(PWD))
 SCRIPTS := $(shell find . -type f -name '*.py')
 LINT := $(SCRIPTS:.py=.pylint)
+SIBLINGS := netlib mitmproxy
 default: install
 	mitmdump --version
 install: setup.py build \
@@ -12,6 +13,12 @@ install: setup.py build \
  .installed/build-base .installed/py3-flask .installed/py3-urwid
 	sudo python3 $< $@
 build: setup.py clean .FORCE | .installed/python3
+	# build companion projects before mitmproxy
+	if [ "$(PACKAGE)" = "mitmproxy" ]; then \
+	 for sibling in $(filter-out $(PACKAGE),$(SIBLINGS)); do \
+	  $(MAKE) -C ../$$sibling $@; \
+	 done; \
+	fi
 	python3 $< $@
 # this really isn't necessary until/unless we want to build an apk package
 $(HOME)/.abuild: | /etc/alpine-release
