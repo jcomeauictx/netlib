@@ -151,7 +151,12 @@ class Reader(_FileLike):
             self.first_byte_timestamp = self.first_byte_timestamp or time.time()
             if not data:
                 break
-            result += data
+            try:
+                result += data
+            except TypeError:
+                logging.error('cannot concatenate %r to %r', data, result)
+                data = data.decode()
+                result += data
             if length != -1:
                 length -= len(data)
         self.add_log(result)
