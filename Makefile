@@ -13,7 +13,7 @@ install: setup.py build \
  .installed/py3-pillow .installed/openssl-dev .installed/libffi-dev \
  .installed/build-base .installed/py3-flask .installed/py3-urwid
 	echo installing $(PACKAGE) from $(CURDIR) called from $(PWD) >&2
-	sudo python3 $< $@
+	sudo python3 $< $@ --force
 build: setup.py clean .FORCE | .installed/python3
 	# build companion projects before mitmproxy
 	if [ "$(PACKAGE)" = "mitmproxy" ]; then \
