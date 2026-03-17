@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import re, copy
 
 def safe_subn(pattern, repl, target, *args, **kwargs):

@@ -1,4 +1,4 @@
-
+from __future__ import unicode_literals
 CONTINUE                        = 100
 SWITCHING                       = 101
 OK                              = 200

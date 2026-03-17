@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import binascii
 try:
     import contrib.md5crypt as md5crypt

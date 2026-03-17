@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import select, socket, threading, sys, time, traceback, logging
 from OpenSSL import SSL
 try:

@@ -1,4 +1,4 @@
-
+from __future__ import unicode_literals
 def isascii(s):
     try:
         s.decode("ascii")

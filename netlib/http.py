@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import string, binascii, logging
 try:
     import odict, utils
@@ -35,6 +36,8 @@ def _is_valid_port(port):
 def _is_valid_host(host):
     try:
         host.decode("idna")
+    except AttributeError:
+        return _is_valid_host(host.encode('latin-1'))
     except ValueError:
         return False
     if "\0" in host:

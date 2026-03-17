@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import urllib, time, traceback
 try:
     import cStringIO

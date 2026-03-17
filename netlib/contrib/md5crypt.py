@@ -8,7 +8,7 @@
 # * this stuff is worth it, you can buy me a beer in return.   Poul-Henning Kamp
 
 # This port adds no further stipulations.  I forfeit any copyright interest.
-
+from __future__ import unicode_literals
 try:
     import md5
 except ImportError:

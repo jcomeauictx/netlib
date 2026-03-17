@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import os, ssl, time, datetime, tempfile, shutil
 from pyasn1.type import univ, constraint, char, namedtype, tag
 from pyasn1.codec.der.decoder import decode
