@@ -1,6 +1,7 @@
 # this version is for alpine 3.14.3/iSH (shell app for iPhone with emulator)
 # it comes with python3.9.16
 # python2.7.18 is available for installation
+from __future__ import unicode_literals
 from distutils.core import setup, setup_keywords
 import fnmatch, os, re, logging
 from netlib import version
