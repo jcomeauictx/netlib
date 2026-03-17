@@ -112,5 +112,12 @@ if 'install_requires' not in setup_keywords:
             name = parts[0] + ' (' + ''.join(parts[1:]) + ')'
             setup_args['requires'][index] = name
     logging.debug('after: requires: %s', setup_args['requires'])
-setup(**setup_args)
+logging.debug('setup_args: %s', setup_args)
+logging.debug('version: %r', setup_args.get('version'))
+try:
+    setup(**setup_args)
+except TypeError:  # python2 distutils rejects unicode package names
+    setup_args['packages'] = map(unicode.encode, setup_args['packages'])
+    logging.debug('setup_args: %s', setup_args)
+    setup(**setup_args)
 # vim: tabstop=8 shiftwidth=4 softtabstop=4 expandtabs
