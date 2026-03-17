@@ -40,7 +40,7 @@ def _is_valid_host(host):
         return _is_valid_host(host.encode('latin-1'))
     except ValueError:
         return False
-    if "\0" in host:
+    if b'\0' in host:
         return None
     return True
 
