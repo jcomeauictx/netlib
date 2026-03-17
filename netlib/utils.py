@@ -2,6 +2,8 @@
 def isascii(s):
     try:
         s.decode("ascii")
+    except AttributeError:
+        return isascii(s.encode('latin-1'))
     except ValueError:
         return False
     return True
