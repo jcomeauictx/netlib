@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import os
 from netlib import certutils
 import tutils

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import cStringIO, textwrap, binascii
 from netlib import http, odict
 import tutils

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import cStringIO, Queue, time, socket
 from netlib import tcp, certutils, test
 import mock
