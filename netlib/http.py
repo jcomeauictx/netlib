@@ -1,4 +1,4 @@
-import string, binascii
+import string, binascii, logging
 try:
     import odict, utils
 except ImportError:
@@ -7,6 +7,7 @@ try:
     import urlparse
 except ImportError:
     from urllib import parse as urlparse  # python3
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 
 class HttpError(Exception):
     def __init__(self, code, msg):
@@ -227,6 +228,7 @@ def assemble_http_basic_auth(scheme, username, password):
 
 
 def parse_init(line):
+    logging.debug('parse_init(%r)', line)
     try:
         method, url, protocol = string.split(line)
     except ValueError:

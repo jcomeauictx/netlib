@@ -1,7 +1,7 @@
 SHELL := /bin/ash
 WHICH := type -p
 PACKAGE := $(notdir $(CURDIR))
-$(warn PACKAGE is $(PACKAGE))
+$(warning PACKAGE is $(PACKAGE))
 SCRIPTS := $(shell find . -type f -name '*.py')
 LINT := $(SCRIPTS:.py=.pylint)
 SIBLINGS := netlib mitmproxy
