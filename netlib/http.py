@@ -9,6 +9,12 @@ except ImportError:
     from urllib import parse as urlparse  # python3
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 
+# python3 compatibility
+try:
+    string.split('')
+except AttributeError:
+    string.split = str.split
+
 class HttpError(Exception):
     def __init__(self, code, msg):
         self.code, self.msg = code, msg
