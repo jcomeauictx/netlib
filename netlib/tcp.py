@@ -1,5 +1,5 @@
 from __future__ import print_function
-import select, socket, threading, sys, time, traceback
+import select, socket, threading, sys, time, traceback, logging
 from OpenSSL import SSL
 try:
     import certutils

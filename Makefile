@@ -1,6 +1,7 @@
 SHELL := /bin/ash
 WHICH := type -p
-PACKAGE := $(notdir $(PWD))
+PACKAGE := $(notdir $(CURDIR))
+$(warn PACKAGE is $(PACKAGE))
 SCRIPTS := $(shell find . -type f -name '*.py')
 LINT := $(SCRIPTS:.py=.pylint)
 SIBLINGS := netlib mitmproxy
@@ -11,6 +12,7 @@ install: setup.py build \
  .installed/python3-dev .installed/py3-libxml2 .installed/musl-dev \
  .installed/py3-pillow .installed/openssl-dev .installed/libffi-dev \
  .installed/build-base .installed/py3-flask .installed/py3-urwid
+	echo installing $(PACKAGE) from $(CURDIR) called from $(PWD) >&2
 	sudo python3 $< $@
 build: setup.py clean .FORCE | .installed/python3
 	# build companion projects before mitmproxy
