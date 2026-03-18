@@ -60,21 +60,21 @@ def parse_url(url):
         return None
     if not scheme:
         return None
-    if ':' in netloc:
-        host, port = string.rsplit(netloc, ':', maxsplit=1)
+    if b':' in netloc:
+        host, port = string.rsplit(netloc, b':', maxsplit=1)
         try:
             port = int(port)
         except ValueError:
             return None
     else:
         host = netloc
-        if scheme == "https":
+        if scheme == b'https':
             port = 443
         else:
             port = 80
-    path = urlparse.urlunparse(('', '', path, params, query, fragment))
-    if not path.startswith("/"):
-        path = "/" + path
+    path = urlparse.urlunparse((b'', b'', path, params, query, fragment))
+    if not path.startswith(b'/'):
+        path = b'/' + path
     if not _is_valid_host(host):
         return None
     if not utils.isascii(path):
@@ -90,18 +90,18 @@ def read_headers(fp):
         reached. Return a ODictCaseless object, or None if headers are invalid.
     """
     ret = []
-    name = ''
+    name = b''
     while 1:
         line = fp.readline()
-        if not line or line == '\r\n' or line == '\n':
+        if not line or line == b'\r\n' or line == b'\n':
             break
-        if line[0] in ' \t':
+        if line[0] in b' \t':
             if not ret:
                 return None
             # continued header
-            ret[-1][1] = ret[-1][1] + '\r\n ' + line.strip()
+            ret[-1][1] = ret[-1][1] + b'\r\n ' + line.strip()
         else:
-            i = line.find(':')
+            i = line.find(b':')
             # We're being liberal in what we accept, here.
             if i > 0:
                 name = line[:i]
@@ -118,13 +118,13 @@ def read_chunked(code, fp, limit):
 
         May raise HttpError.
     """
-    content = ""
+    content = b''
     total = 0
     while 1:
         line = fp.readline(128)
-        if line == "":
+        if line == b'':
             raise HttpErrorConnClosed(code, "Connection closed prematurely")
-        if line != '\r\n' and line != '\n':
+        if line != b'\r\n' and line != b'\n':
             try:
                 length = int(line, 16)
             except ValueError:
@@ -140,13 +140,13 @@ def read_chunked(code, fp, limit):
                 raise HttpError(code, msg)
             content += fp.read(length)
             line = fp.readline(5)
-            if line != '\r\n':
+            if line != b'\r\n':
                 raise HttpError(code, "Malformed chunked body")
     while 1:
         line = fp.readline()
-        if line == "":
+        if line == b'':
             raise HttpErrorConnClosed(code, "Connection closed prematurely")
-        if line == '\r\n' or line == '\n':
+        if line == b'\r\n' or line == b'\n':
             break
     return content
 
@@ -159,7 +159,7 @@ def get_header_tokens(headers, key):
     """
     toks = []
     for i in headers[key]:
-        for j in i.split(","):
+        for j in i.split(b','):
             toks.append(j.strip())
     return toks
 
@@ -202,12 +202,12 @@ def parse_http_protocol(s):
         Parse an HTTP protocol declaration. Returns a (major, minor) tuple, or
         None.
     """
-    if not s.startswith("HTTP/"):
+    if not s.startswith(b'HTTP/'):
         return None
-    _, version = s.split('/', 1)
-    if "." not in version:
+    _, version = s.split(b'/', 1)
+    if b'.' not in version:
         return None
-    major, minor = version.split('.', 1)
+    major, minor = version.split(b'.', 1)
     try:
         major = int(major)
         minor = int(minor)
@@ -225,21 +225,21 @@ def parse_http_basic_auth(s):
         user = binascii.a2b_base64(words[1])
     except binascii.Error:
         return None
-    parts = user.split(':')
+    parts = user.split(b':')
     if len(parts) != 2:
         return None
     return scheme, parts[0], parts[1]
 
 
 def assemble_http_basic_auth(scheme, username, password):
-    v = binascii.b2a_base64(username + ":" + password)
+    v = binascii.b2a_base64(username + b':' + password)
     return scheme + " " + v
 
 
 def parse_init(line):
     logging.debug('parse_init(%r)', line)
     try:
-        method, url, protocol = string.split(line)
+        method, url, protocol = line.split()
     except ValueError:
         return None
     httpversion = parse_http_protocol(protocol)
@@ -256,10 +256,10 @@ def parse_init_connect(line):
         return None
     method, url, httpversion = v
 
-    if method.upper() != 'CONNECT':
+    if method.upper() != b'CONNECT':
         return None
     try:
-        host, port = url.split(":")
+        host, port = url.split(b':')
     except ValueError:
         return None
     try:
@@ -296,7 +296,7 @@ def parse_init_http(line):
     method, url, httpversion = v
     if not utils.isascii(url):
         return None
-    if not (url.startswith("/") or url == "*"):
+    if not (url.startswith(b'/') or url == b'*'):
         return None
     return method, url, httpversion
 
