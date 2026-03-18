@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
 import re, copy
+try:
+    basestring
+except NameError:
+    basestring = str
 
 def safe_subn(pattern, repl, target, *args, **kwargs):
     """

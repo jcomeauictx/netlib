@@ -2,6 +2,10 @@ from __future__ import unicode_literals
 import tempfile, os, shutil
 from contextlib import contextmanager
 from libpathod import utils
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 @contextmanager
