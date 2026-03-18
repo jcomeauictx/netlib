@@ -1,9 +1,13 @@
 from __future__ import unicode_literals
 import urllib, time, traceback
 try:
+    from urllib import unquote as urlunquote
+except ImportError:
+    from urllib.parse import unquote as urlunquote
+try:
     import cStringIO
 except ImportError:
-    from io import BytesIO as cStringIO  # python3
+    import io as cStringIO  # python3
 try:
     import odict
 except ImportError:
@@ -58,7 +62,7 @@ class WSGIAdaptor:
             'SERVER_SOFTWARE':      self.sversion,
             'REQUEST_METHOD':       request.method,
             'SCRIPT_NAME':          '',
-            'PATH_INFO':            urllib.unquote(path_info),
+            'PATH_INFO':            urlunquote(path_info),
             'QUERY_STRING':         query,
             'CONTENT_TYPE':         request.headers.get('Content-Type', [''])[0],
             'CONTENT_LENGTH':       request.headers.get('Content-Length', [''])[0],

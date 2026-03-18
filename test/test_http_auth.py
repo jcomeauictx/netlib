@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
-import binascii, cStringIO
+import binascii
+try:
+    import cStringIO
+except ImportError:
+    import io as cStringIO
 from netlib import odict, http_auth, http
 import tutils
 
