@@ -91,6 +91,10 @@ class _FileLike:
 
 
 class Writer(_FileLike):
+    '''
+    bytestream writer
+    '''
+
     def flush(self):
         """
             May raise NetLibDisconnect
@@ -102,11 +106,11 @@ class Writer(_FileLike):
                 raise NetLibDisconnect(str(v))
 
     def write(self, v):
-        """
-            May raise NetLibDisconnect
-        """
+        '''
+        May raise NetLibDisconnect
+        '''
         if v:
-            logging.debug('attempting to write %s', v)
+            logging.debug('attempting to write %r', v)
             try:
                 if hasattr(self.o, "sendall"):
                     self.add_log(v)
@@ -120,6 +124,9 @@ class Writer(_FileLike):
 
 
 class Reader(_FileLike):
+    '''
+    bytestream reader
+    '''
     def read(self, length):
         """
             If length is -1, we read until connection closes.

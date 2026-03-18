@@ -34,10 +34,13 @@ def _is_valid_port(port):
 
 
 def _is_valid_host(host):
+    '''
+    checks validity of host (bytes)
+    '''
     try:
-        host.decode("idna")
+        host.decode(u'idna')
     except AttributeError:
-        return _is_valid_host(host.encode('latin-1'))
+        raise ValueError(u'host must be bytestring')
     except ValueError:
         return False
     if b'\0' in host:
@@ -46,14 +49,16 @@ def _is_valid_host(host):
 
 
 def parse_url(url):
-    """
-        Returns a (scheme, host, port, path) tuple, or None on error.
+    '''
+    returns a (scheme, host, port, path) tuple, or None on error.
 
-        Checks that:
-            port is an integer 0-65535
-            host is a valid IDNA-encoded hostname with no null-bytes
-            path is valid ASCII
-    """
+    checks that:
+        port is an integer 0-65535
+        host is a valid IDNA-encoded hostname with no null-bytes
+        path is valid ASCII
+
+    input is bytes, output is strings and integers
+    '''
     try:
         scheme, netloc, path, params, query, fragment = urlparse.urlparse(url)
     except ValueError:
@@ -81,14 +86,13 @@ def parse_url(url):
         return None
     if not _is_valid_port(port):
         return None
-    return scheme, host, port, path
-
+    return scheme.decode(), host.decode(), port, path.decode()
 
 def read_headers(fp):
-    """
-        Read a set of headers from a file pointer. Stop once a blank line is
-        reached. Return a ODictCaseless object, or None if headers are invalid.
-    """
+    '''
+    read a set of headers from a file pointer, stopping on a blank line.
+    return a ODictCaseless object, or None if headers are invalid.
+    '''
     ret = []
     name = b''
     while 1:
@@ -130,22 +134,27 @@ def read_chunked(code, fp, limit):
             except ValueError:
                 # FIXME: Not strictly correct - this could be from the server, in which
                 # case we should send a 502.
-                raise HttpError(code, "Invalid chunked encoding length: %s"%line)
+                raise HttpError(
+                    code,
+                    u'Invalid chunked encoding length: %r' % line
+                )
             if not length:
                 break
             total += length
             if limit is not None and total > limit:
-                msg = "HTTP Body too large."\
-                      " Limit is %s, chunked content length was at least %s"%(limit, total)
+                msg = (
+                    u'HTTP Body too large. Limit is %s, '
+                    u'chunked content length was at least %s'
+                ) % (limit, total)
                 raise HttpError(code, msg)
             content += fp.read(length)
             line = fp.readline(5)
             if line != b'\r\n':
-                raise HttpError(code, "Malformed chunked body")
+                raise HttpError(code, u'Malformed chunked body')
     while 1:
         line = fp.readline()
         if line == b'':
-            raise HttpErrorConnClosed(code, "Connection closed prematurely")
+            raise HttpErrorConnClosed(code, u'Connection closed prematurely')
         if line == b'\r\n' or line == b'\n':
             break
     return content
@@ -198,10 +207,12 @@ def read_http_body(code, rfile, headers, all, limit):
 
 
 def parse_http_protocol(s):
-    """
-        Parse an HTTP protocol declaration. Returns a (major, minor) tuple, or
-        None.
-    """
+    '''
+    parse an HTTP protocol declaration.
+
+    expects bytes and returns (major, minor) tuple, or None.
+    '''
+    logging.debug('parse_http_protocol: line=%r', s)
     if not s.startswith(b'HTTP/'):
         return None
     _, version = s.split(b'/', 1)
@@ -237,6 +248,9 @@ def assemble_http_basic_auth(scheme, username, password):
 
 
 def parse_init(line):
+    '''
+    parse request line and return as bytes
+    '''
     logging.debug('parse_init %r', line)
     try:
         method, url, protocol = line.split()
