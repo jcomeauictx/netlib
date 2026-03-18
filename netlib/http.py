@@ -237,7 +237,7 @@ def assemble_http_basic_auth(scheme, username, password):
 
 
 def parse_init(line):
-    logging.debug('parse_init(%r)', line)
+    logging.debug('parse_init %r', line)
     try:
         method, url, protocol = line.split()
     except ValueError:
@@ -247,6 +247,9 @@ def parse_init(line):
         return None
     if not utils.isascii(method):
         return None
+    logging.debug('parse_init returning %s', {
+        'method': method, 'url': url, 'httpversion': httpversion
+    })
     return method, url, httpversion
 
 
@@ -332,11 +335,11 @@ def read_http_body_request(rfile, wfile, headers, httpversion, limit):
     """
         Read the HTTP body from a client request.
     """
-    if "expect" in headers:
+    if u'expect' in headers:
         # FIXME: Should be forwarded upstream
-        if "100-continue" in headers['expect'] and httpversion >= (1, 1):
-            wfile.write('HTTP/1.1 100 Continue\r\n')
-            wfile.write('\r\n')
+        if u'100-continue' in headers[u'expect'] and httpversion >= (1, 1):
+            wfile.write(b'HTTP/1.1 100 Continue\r\n')
+            wfile.write(b'\r\n')
             del headers['expect']
     return read_http_body(400, rfile, headers, False, limit)
 
@@ -350,9 +353,9 @@ def read_http_body_response(rfile, headers, limit):
 
 
 def parse_response_line(line):
-    parts = line.strip().split(" ", 2)
+    parts = line.strip().split(b' ', 2)
     if len(parts) == 2: # handle missing message gracefully
-        parts.append("")
+        parts.append(b'')
     if len(parts) != 3:
         return None
     proto, code, msg = parts
@@ -368,7 +371,7 @@ def read_response(rfile, method, body_size_limit):
         Return an (httpversion, code, msg, headers, content) tuple.
     """
     line = rfile.readline()
-    if line == "\r\n" or line == "\n": # Possible leftover from previous message
+    if line in (b'\r\n', b'\n'): # Possible leftover from previous message
         line = rfile.readline()
     if not line:
         raise HttpErrorConnClosed(502, "Server disconnect.")
