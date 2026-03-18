@@ -106,6 +106,7 @@ class Writer(_FileLike):
             May raise NetLibDisconnect
         """
         if v:
+            logging.debug('attempting to write %s', v)
             try:
                 if hasattr(self.o, "sendall"):
                     self.add_log(v)
@@ -264,6 +265,10 @@ class BaseHandler:
     rbufsize = -1
     wbufsize = -1
     def __init__(self, connection, client_address, server):
+        logging.debug(
+            'handling connection %s, %s, %s',
+            connection, client_address, server
+        )
         self.connection = connection
         self.rfile = Reader(self.connection.makefile('rb', self.rbufsize))
         self.wfile = Writer(self.connection.makefile('wb', self.wbufsize))
