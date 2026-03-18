@@ -123,7 +123,7 @@ class Reader(_FileLike):
         """
             If length is -1, we read until connection closes.
         """
-        result = b''
+        result = ''
         start = time.time()
         while length == -1 or length > 0:
             if length == -1 or length > self.BLOCKSIZE:
@@ -163,7 +163,7 @@ class Reader(_FileLike):
         return result
 
     def readline(self, size = None):
-        result = b''
+        result = ''
         bytes_read = 0
         while True:
             if size is not None and bytes_read >= size:
@@ -177,7 +177,7 @@ class Reader(_FileLike):
                 break
             else:
                 result += ch
-                if ch == b'\n':
+                if ch in '\r\n':
                     break
         return result
 
