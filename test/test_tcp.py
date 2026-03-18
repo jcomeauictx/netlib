@@ -1,5 +1,13 @@
 from __future__ import unicode_literals
-import cStringIO, Queue, time, socket
+import time, socket
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
+try:
+    import cStringIO
+except ImportError:
+    import io as cStringIO
 from netlib import tcp, certutils, test
 import mock
 import tutils

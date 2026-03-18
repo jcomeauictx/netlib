@@ -1,6 +1,17 @@
 from __future__ import unicode_literals
-import threading, Queue, cStringIO
-import tcp, certutils
+import threading
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
+try:
+    import cStringIO
+except ImportError:
+    import io as cStringIO
+try:
+    import tcp, certutils
+except ImportError:
+    from . import tcp, certutils
 import logging
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARNING)
 
