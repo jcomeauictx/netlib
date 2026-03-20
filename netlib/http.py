@@ -298,10 +298,12 @@ def parse_init_proxy(line):
     v = parse_init(line)
     if not v:
         return None
+    logging.debug('parse_init_proxy: first parse: %r', v)
     method, url, httpversion = v
     parts = parse_url(url)
     if not parts:
         return None
+    logging.debug('parse_init_proxy: second parse: %r', parts)
     scheme, host, port, path = parts
     return method, scheme, host, port, path, httpversion
 
