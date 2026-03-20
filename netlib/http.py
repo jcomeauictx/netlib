@@ -250,6 +250,8 @@ def assemble_http_basic_auth(scheme, username, password):
 def parse_init(line):
     '''
     parse request line and return as bytes
+
+    line *must be* bytes for utils.isascii() to work
     '''
     logging.debug('parse_init %r', line)
     try:
@@ -304,9 +306,11 @@ def parse_init_proxy(line):
 
 
 def parse_init_http(line):
-    """
-        Returns (method, url, httpversion)
-    """
+    '''
+    returns (method, url, httpversion) as bytes
+
+    line *must be bytes* for utils.isascii() to work
+    '''
     v = parse_init(line)
     if not v:
         return None
