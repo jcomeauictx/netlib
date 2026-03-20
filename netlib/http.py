@@ -369,7 +369,7 @@ def read_http_body_response(rfile, headers, limit):
 
 
 def parse_response_line(line):
-    parts = line.strip().split(b' ', 2)
+    parts = line.strip().split(u' ', 2)
     if len(parts) == 2: # handle missing message gracefully
         parts.append(b'')
     if len(parts) != 3:
@@ -386,7 +386,7 @@ def read_response(rfile, method, body_size_limit):
     '''
     return an (httpversion, code, msg, headers, content) tuple.
     '''
-    line = rfile.readline()
+    line = rfile.readline().decode()
     if line in (u'\r\n', u'\n'): # Possible leftover from previous message
         line = rfile.readline()
     if not line:
