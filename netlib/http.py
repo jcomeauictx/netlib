@@ -35,15 +35,13 @@ def _is_valid_port(port):
 
 def _is_valid_host(host):
     '''
-    checks validity of host (bytes)
+    checks validity of host (passed as string)
     '''
     try:
-        host.decode(u'idna')
-    except AttributeError:
-        raise ValueError(u'host must be bytestring')
+        host.encode().decode(u'idna')
     except ValueError:
         return False
-    if b'\0' in host:
+    if u'\0' in host:
         return None
     return True
 
@@ -57,7 +55,7 @@ def parse_url(url):
         host is a valid IDNA-encoded hostname with no null-bytes
         path is valid ASCII
 
-    input is bytes, output is strings and integers
+    input is a string, output is strings and integers
     '''
     try:
         scheme, netloc, path, params, query, fragment = urlparse.urlparse(url)
@@ -65,28 +63,28 @@ def parse_url(url):
         return None
     if not scheme:
         return None
-    if b':' in netloc:
-        host, port = string.rsplit(netloc, b':', maxsplit=1)
+    if u':' in netloc:
+        host, port = string.rsplit(netloc, u':', maxsplit=1)
         try:
             port = int(port)
         except ValueError:
             return None
     else:
         host = netloc
-        if scheme == b'https':
+        if scheme == u'https':
             port = 443
         else:
             port = 80
-    path = urlparse.urlunparse((b'', b'', path, params, query, fragment))
-    if not path.startswith(b'/'):
-        path = b'/' + path
+    path = urlparse.urlunparse((u'', u'', path, params, query, fragment))
+    if not path.startswith(u'/'):
+        path = u'/' + path
     if not _is_valid_host(host):
         return None
     if not utils.isascii(path):
         return None
     if not _is_valid_port(port):
         return None
-    return scheme.decode(), host.decode(), port, path.decode()
+    return scheme, host, port, path
 
 def read_headers(fp):
     '''
@@ -210,15 +208,15 @@ def parse_http_protocol(s):
     '''
     parse an HTTP protocol declaration.
 
-    expects bytes and returns (major, minor) tuple, or None.
+    expects a string and returns (major, minor) tuple, or None.
     '''
     logging.debug('parse_http_protocol: line=%r', s)
-    if not s.startswith(b'HTTP/'):
+    if not s.startswith(u'HTTP/'):
         return None
-    _, version = s.split(b'/', 1)
-    if b'.' not in version:
+    _, version = s.split(u'/', 1)
+    if u'.' not in version:
         return None
-    major, minor = version.split(b'.', 1)
+    major, minor = version.split(u'.', 1)
     try:
         major = int(major)
         minor = int(minor)
@@ -236,7 +234,7 @@ def parse_http_basic_auth(s):
         user = binascii.a2b_base64(words[1])
     except binascii.Error:
         return None
-    parts = user.split(b':')
+    parts = user.split(u':')
     if len(parts) != 2:
         return None
     return scheme, parts[0], parts[1]
@@ -244,18 +242,16 @@ def parse_http_basic_auth(s):
 
 def assemble_http_basic_auth(scheme, username, password):
     v = binascii.b2a_base64(username + b':' + password)
-    return scheme + " " + v
+    return scheme + b' ' + v
 
 
 def parse_init(line):
     '''
-    parse request line and return as bytes
-
-    line *must be* bytes for utils.isascii() to work
+    parse request line and return as strings
     '''
     logging.debug('parse_init %r', line)
     try:
-        method, url, protocol = line.split()
+        method, url, protocol = line.decode().split()
     except ValueError:
         return None
     httpversion = parse_http_protocol(protocol)
@@ -276,7 +272,7 @@ def parse_init_connect(line):
         return None
     method, url, httpversion = v
 
-    if method.upper() != b'CONNECT':
+    if method.upper() != u'CONNECT':
         return None
     try:
         host, port = url.split(b':')
@@ -310,9 +306,7 @@ def parse_init_proxy(line):
 
 def parse_init_http(line):
     '''
-    returns (method, url, httpversion) as bytes
-
-    line *must be bytes* for utils.isascii() to work
+    returns (method, url, httpversion) as strings
     '''
     logging.debug('parse_init_http: %r', line)
     v = parse_init(line)
@@ -321,20 +315,20 @@ def parse_init_http(line):
     method, url, httpversion = v
     if not utils.isascii(url):
         return None
-    if not (url.startswith(b'/') or url == b'*'):
+    if not (url.startswith(u'/') or url == u'*'):
         return None
     return method, url, httpversion
 
 
 def request_connection_close(httpversion, headers):
-    """
-        Checks the request to see if the client connection should be closed.
-    """
-    if "connection" in headers:
-        toks = get_header_tokens(headers, "connection")
-        if "close" in toks:
+    '''
+    checks the request to see if the client connection should be closed.
+    '''
+    if u'connection' in headers:
+        toks = get_header_tokens(headers, u'connection')
+        if u'close' in toks:
             return True
-        elif "keep-alive" in toks:
+        elif u'keep-alive' in toks:
             return False
     # HTTP 1.1 connections are assumed to be persistent
     if httpversion == (1, 1):
@@ -343,34 +337,34 @@ def request_connection_close(httpversion, headers):
 
 
 def response_connection_close(httpversion, headers):
-    """
-        Checks the response to see if the client connection should be closed.
-    """
+    '''
+    checks the response to see if the client connection should be closed.
+    '''
     if request_connection_close(httpversion, headers):
         return True
-    elif (not has_chunked_encoding(headers)) and "content-length" in headers:
+    elif (not has_chunked_encoding(headers)) and u'content-length' in headers:
         return False
     return True
 
 
 def read_http_body_request(rfile, wfile, headers, httpversion, limit):
-    """
-        Read the HTTP body from a client request.
-    """
+    '''
+    read the HTTP body from a client request.
+    '''
     if u'expect' in headers:
         # FIXME: Should be forwarded upstream
         if u'100-continue' in headers[u'expect'] and httpversion >= (1, 1):
             wfile.write(b'HTTP/1.1 100 Continue\r\n')
             wfile.write(b'\r\n')
-            del headers['expect']
+            del headers[u'expect']
     return read_http_body(400, rfile, headers, False, limit)
 
 
 def read_http_body_response(rfile, headers, limit):
-    """
-        Read the HTTP body from a server response.
-    """
-    all = "close" in get_header_tokens(headers, "connection")
+    '''
+    read the HTTP body from a server response.
+    '''
+    all = u'close' in get_header_tokens(headers, u'connection')
     return read_http_body(500, rfile, headers, all, limit)
 
 
@@ -389,28 +383,28 @@ def parse_response_line(line):
 
 
 def read_response(rfile, method, body_size_limit):
-    """
-        Return an (httpversion, code, msg, headers, content) tuple.
-    """
+    '''
+    return an (httpversion, code, msg, headers, content) tuple.
+    '''
     line = rfile.readline()
-    if line in (b'\r\n', b'\n'): # Possible leftover from previous message
+    if line in (u'\r\n', u'\n'): # Possible leftover from previous message
         line = rfile.readline()
     if not line:
-        raise HttpErrorConnClosed(502, "Server disconnect.")
+        raise HttpErrorConnClosed(502, u'Server disconnect.')
     parts = parse_response_line(line)
     if not parts:
-        raise HttpError(502, "Invalid server response: %s"%repr(line))
+        raise HttpError(502, u'Invalid server response: %r' % line)
     proto, code, msg = parts
     httpversion = parse_http_protocol(proto)
     if httpversion is None:
-        raise HttpError(502, "Invalid HTTP version in line: %s"%repr(proto))
+        raise HttpError(502, u'Invalid HTTP version in line: %s' % proto)
     headers = read_headers(rfile)
     if headers is None:
-        raise HttpError(502, "Invalid headers.")
+        raise HttpError(502, u'Invalid headers.')
     if code >= 100 and code <= 199:
         return read_response(rfile, method, body_size_limit)
-    if method == "HEAD" or code == 204 or code == 304:
-        content = ""
+    if method == u'HEAD' or code == 204 or code == 304:
+        content = u''
     else:
         content = read_http_body_response(rfile, headers, body_size_limit)
     return httpversion, code, msg, headers, content

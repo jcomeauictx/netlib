@@ -107,17 +107,18 @@ class Writer(_FileLike):
 
     def write(self, v):
         '''
-        May raise NetLibDisconnect
+        may raise NetLibDisconnect
         '''
         if v:
-            logging.debug('attempting to write %r', v)
+            encoded = v.encode()
+            logging.debug('attempting to write %r', encoded)
             try:
-                if hasattr(self.o, "sendall"):
-                    self.add_log(v)
-                    return self.o.sendall(v)
+                if hasattr(self.o, u'sendall'):
+                    self.add_log(encoded)
+                    return self.o.sendall(encoded)
                 else:
-                    r = self.o.write(v)
-                    self.add_log(v[:r])
+                    r = self.o.write(encoded)
+                    self.add_log(encoded[:r])
                     return r
             except (SSL.Error, socket.error) as v:
                 raise NetLibDisconnect(str(v))
