@@ -270,6 +270,7 @@ def parse_init(line):
 
 
 def parse_init_connect(line):
+    logging.debug('parse_init_connect: %r', line)
     v = parse_init(line)
     if not v:
         return None
@@ -293,11 +294,11 @@ def parse_init_connect(line):
 
 
 def parse_init_proxy(line):
+    logging.debug('parse_init_proxy: %r', line)
     v = parse_init(line)
     if not v:
         return None
     method, url, httpversion = v
-
     parts = parse_url(url)
     if not parts:
         return None
@@ -311,6 +312,7 @@ def parse_init_http(line):
 
     line *must be bytes* for utils.isascii() to work
     '''
+    logging.debug('parse_init_http: %r', line)
     v = parse_init(line)
     if not v:
         return None
