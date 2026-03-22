@@ -67,8 +67,8 @@ class TimeoutHandler(tcp.BaseHandler):
 class TestServer(test.ServerTestBase):
     handler = EchoHandler
     def test_echo(self):
-        testval = "echo!\n"
-        c = tcp.TCPClient("127.0.0.1", self.port)
+        testval = b'echo!\n'
+        c = tcp.TCPClient(u'127.0.0.1', self.port)
         c.connect()
         c.wfile.write(testval)
         c.wfile.flush()
@@ -88,16 +88,15 @@ class FinishFailHandler(tcp.BaseHandler):
 
 
 class TestFinishFail(test.ServerTestBase):
-    """
-        This tests a difficult-to-trigger exception in the .finish() method of
-        the handler.
-    """
+    '''
+    This tests a difficult-to-trigger exception in the .finish() method of
+    the handler.
+    '''
     handler = FinishFailHandler
     def test_disconnect_in_finish(self):
-        testval = "echo!\n"
-        c = tcp.TCPClient("127.0.0.1", self.port)
+        c = tcp.TCPClient(u'127.0.0.1', self.port)
         c.connect()
-        c.wfile.write("foo\n")
+        c.wfile.write(b'foo\n')
         c.wfile.flush()
         c.rfile.read(4)
         h = self.last_handler
@@ -107,8 +106,8 @@ class TestFinishFail(test.ServerTestBase):
 class TestDisconnect(test.ServerTestBase):
     handler = EchoHandler
     def test_echo(self):
-        testval = "echo!\n"
-        c = tcp.TCPClient("127.0.0.1", self.port)
+        testval = b'echo!\n'
+        c = tcp.TCPClient(u'127.0.0.1', self.port)
         c.connect()
         c.wfile.write(testval)
         c.wfile.flush()
@@ -118,16 +117,16 @@ class TestDisconnect(test.ServerTestBase):
 class TestServerSSL(test.ServerTestBase):
     handler = EchoHandler
     ssl = dict(
-                cert = tutils.test_data.path("data/server.crt"),
-                key = tutils.test_data.path("data/server.key"),
+                cert = tutils.test_data.path(u'data/server.crt'),
+                key = tutils.test_data.path(u'data/server.key'),
                 request_client_cert = False,
                 v3_only = False
             )
     def test_echo(self):
-        c = tcp.TCPClient("127.0.0.1", self.port)
+        c = tcp.TCPClient(u'127.0.0.1', self.port)
         c.connect()
         c.convert_to_ssl(sni="foo.com", options=tcp.OP_ALL)
-        testval = "echo!\n"
+        testval = b'echo!\n'
         c.wfile.write(testval)
         c.wfile.flush()
         assert c.rfile.readline() == testval
@@ -286,7 +285,7 @@ class TestFileLike:
         assert s.readline(3) == "foo"
 
     def test_limitless(self):
-        s = cStringIO.StringIO("f"*(50*1024))
+        s = cStringIO.BytesIO(b'f' * (50 * 1024))
         s = tcp.Reader(s)
         ret = s.read(-1)
         assert len(ret) == 50 * 1024
