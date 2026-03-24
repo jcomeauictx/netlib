@@ -5,6 +5,10 @@ try:
     import certutils
 except ImportError:
     from . import certutils  # python3 syntax
+try:
+    file
+except NameError:
+    file = open
 
 SSLv2_METHOD = SSL.SSLv2_METHOD
 SSLv3_METHOD = SSL.SSLv3_METHOD

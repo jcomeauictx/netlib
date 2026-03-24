@@ -13,6 +13,10 @@ try:
 except ImportError:
     from . import tcp, certutils
 import logging
+try:
+    file
+except NameError:
+    file = open
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARNING)
 
 class ServerThread(threading.Thread):

@@ -2,7 +2,10 @@ from __future__ import unicode_literals
 import os
 from netlib import certutils
 import tutils
-
+try:
+    file
+except NameError:
+    file = open
 
 def test_dummy_ca():
     with tutils.tmpdir() as d:

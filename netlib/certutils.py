@@ -8,6 +8,10 @@ try:
     import tcp
 except ImportError:
     from . import tcp  # python3 syntax
+try:
+    file
+except NameError:
+    file = open
 
 def create_ca():
     key = OpenSSL.crypto.PKey()
