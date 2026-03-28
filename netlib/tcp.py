@@ -116,7 +116,7 @@ class Writer(_FileLike):
         if v:
             logging.debug('attempting to write %r', v)
             try:
-                if hasattr(self.o, u'sendall'):
+                if hasattr(self.o, 'sendall'):
                     self.add_log(v)
                     return self.o.sendall(v)
                 else:

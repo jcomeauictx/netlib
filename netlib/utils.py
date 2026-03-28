@@ -4,7 +4,7 @@ def isascii(s):
     ensures string is valid ASCII
     '''
     try:
-        s.encode().decode(u'ascii')
+        s.encode().decode('ascii')
     except ValueError:
         return False
     return True
@@ -21,11 +21,11 @@ def cleanBin(s, fixspacing=False):
         o = ord(i)
         if (o > 31 and o < 127):
             parts.append(i)
-        elif i in u'\n\t' and not fixspacing:
+        elif i in '\n\t' and not fixspacing:
             parts.append(i)
         else:
-            parts.append(u'.')
-    return u''.join(parts)
+            parts.append('.')
+    return ''.join(parts)
 
 
 def hexdump(s):
@@ -34,12 +34,12 @@ def hexdump(s):
     '''
     parts = []
     for i in range(0, len(s), 16):
-        o = u'%.10x' % i
+        o = '%.10x' % i
         part = s[i:i + 16]
-        x = u' '.join('%.2x' % ord(i) for i in part)
+        x = ' '.join('%.2x' % ord(i) for i in part)
         if len(part) < 16:
-            x += u' '
-            x += u' '.join('  ' for i in range(16 - len(part)))
+            x += ' '
+            x += ' '.join('  ' for i in range(16 - len(part)))
         parts.append(
             (o, x, cleanBin(part, True))
         )

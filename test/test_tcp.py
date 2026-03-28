@@ -68,7 +68,7 @@ class TestServer(test.ServerTestBase):
     handler = EchoHandler
     def test_echo(self):
         testval = b'echo!\n'
-        c = tcp.TCPClient(u'127.0.0.1', self.port)
+        c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         c.wfile.write(testval)
         c.wfile.flush()
@@ -94,7 +94,7 @@ class TestFinishFail(test.ServerTestBase):
     '''
     handler = FinishFailHandler
     def test_disconnect_in_finish(self):
-        c = tcp.TCPClient(u'127.0.0.1', self.port)
+        c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         c.wfile.write(b'foo\n')
         c.wfile.flush()
@@ -107,7 +107,7 @@ class TestDisconnect(test.ServerTestBase):
     handler = EchoHandler
     def test_echo(self):
         testval = b'echo!\n'
-        c = tcp.TCPClient(u'127.0.0.1', self.port)
+        c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         c.wfile.write(testval)
         c.wfile.flush()
@@ -117,13 +117,13 @@ class TestDisconnect(test.ServerTestBase):
 class TestServerSSL(test.ServerTestBase):
     handler = EchoHandler
     ssl = dict(
-                cert = tutils.test_data.path(u'data/server.crt'),
-                key = tutils.test_data.path(u'data/server.key'),
+                cert = tutils.test_data.path('data/server.crt'),
+                key = tutils.test_data.path('data/server.key'),
                 request_client_cert = False,
                 v3_only = False
             )
     def test_echo(self):
-        c = tcp.TCPClient(u'127.0.0.1', self.port)
+        c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         c.convert_to_ssl(sni="foo.com", options=tcp.OP_ALL)
         testval = b'echo!\n'

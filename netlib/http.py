@@ -38,10 +38,10 @@ def _is_valid_host(host):
     checks validity of host (passed as string)
     '''
     try:
-        host.encode().decode(u'idna')
+        host.encode().decode('idna')
     except ValueError:
         return False
-    if u'\0' in host:
+    if '\0' in host:
         return None
     return True
 
@@ -63,21 +63,21 @@ def parse_url(url):
         return None
     if not scheme:
         return None
-    if u':' in netloc:
-        host, port = string.rsplit(netloc, u':', maxsplit=1)
+    if ':' in netloc:
+        host, port = string.rsplit(netloc, ':', maxsplit=1)
         try:
             port = int(port)
         except ValueError:
             return None
     else:
         host = netloc
-        if scheme == u'https':
+        if scheme == 'https':
             port = 443
         else:
             port = 80
-    path = urlparse.urlunparse((u'', u'', path, params, query, fragment))
-    if not path.startswith(u'/'):
-        path = u'/' + path
+    path = urlparse.urlunparse(('', '', path, params, query, fragment))
+    if not path.startswith('/'):
+        path = '/' + path
     if not _is_valid_host(host):
         return None
     if not utils.isascii(path):
@@ -134,25 +134,25 @@ def read_chunked(code, fp, limit):
                 # case we should send a 502.
                 raise HttpError(
                     code,
-                    u'Invalid chunked encoding length: %r' % line
+                    'Invalid chunked encoding length: %r' % line
                 )
             if not length:
                 break
             total += length
             if limit is not None and total > limit:
                 msg = (
-                    u'HTTP Body too large. Limit is %s, '
-                    u'chunked content length was at least %s'
+                    'HTTP Body too large. Limit is %s, '
+                    'chunked content length was at least %s'
                 ) % (limit, total)
                 raise HttpError(code, msg)
             content += fp.read(length)
             line = fp.readline(5)
             if line != b'\r\n':
-                raise HttpError(code, u'Malformed chunked body')
+                raise HttpError(code, 'Malformed chunked body')
     while 1:
         line = fp.readline()
         if line == b'':
-            raise HttpErrorConnClosed(code, u'Connection closed prematurely')
+            raise HttpErrorConnClosed(code, 'Connection closed prematurely')
         if line == b'\r\n' or line == b'\n':
             break
     return content
@@ -211,12 +211,12 @@ def parse_http_protocol(s):
     expects a string and returns (major, minor) tuple, or None.
     '''
     logging.debug('parse_http_protocol: line=%r', s)
-    if not s.startswith(u'HTTP/'):
+    if not s.startswith('HTTP/'):
         return None
-    _, version = s.split(u'/', 1)
-    if u'.' not in version:
+    _, version = s.split('/', 1)
+    if '.' not in version:
         return None
-    major, minor = version.split(u'.', 1)
+    major, minor = version.split('.', 1)
     try:
         major = int(major)
         minor = int(minor)
@@ -234,7 +234,7 @@ def parse_http_basic_auth(s):
         user = binascii.a2b_base64(words[1])
     except binascii.Error:
         return None
-    parts = user.split(u':')
+    parts = user.split(':')
     if len(parts) != 2:
         return None
     return scheme, parts[0], parts[1]
@@ -272,7 +272,7 @@ def parse_init_connect(line):
         return None
     method, url, httpversion = v
 
-    if method.upper() != u'CONNECT':
+    if method.upper() != 'CONNECT':
         return None
     try:
         host, port = url.split(b':')
@@ -315,7 +315,7 @@ def parse_init_http(line):
     method, url, httpversion = v
     if not utils.isascii(url):
         return None
-    if not (url.startswith(u'/') or url == u'*'):
+    if not (url.startswith('/') or url == '*'):
         return None
     return method, url, httpversion
 
@@ -324,11 +324,11 @@ def request_connection_close(httpversion, headers):
     '''
     checks the request to see if the client connection should be closed.
     '''
-    if u'connection' in headers:
-        toks = get_header_tokens(headers, u'connection')
-        if u'close' in toks:
+    if 'connection' in headers:
+        toks = get_header_tokens(headers, 'connection')
+        if 'close' in toks:
             return True
-        elif u'keep-alive' in toks:
+        elif 'keep-alive' in toks:
             return False
     # HTTP 1.1 connections are assumed to be persistent
     if httpversion == (1, 1):
@@ -342,7 +342,7 @@ def response_connection_close(httpversion, headers):
     '''
     if request_connection_close(httpversion, headers):
         return True
-    elif (not has_chunked_encoding(headers)) and u'content-length' in headers:
+    elif (not has_chunked_encoding(headers)) and 'content-length' in headers:
         return False
     return True
 
@@ -351,12 +351,12 @@ def read_http_body_request(rfile, wfile, headers, httpversion, limit):
     '''
     read the HTTP body from a client request.
     '''
-    if u'expect' in headers:
+    if 'expect' in headers:
         # FIXME: Should be forwarded upstream
-        if u'100-continue' in headers[u'expect'] and httpversion >= (1, 1):
+        if '100-continue' in headers['expect'] and httpversion >= (1, 1):
             wfile.write(b'HTTP/1.1 100 Continue\r\n')
             wfile.write(b'\r\n')
-            del headers[u'expect']
+            del headers['expect']
     return read_http_body(400, rfile, headers, False, limit)
 
 
@@ -364,12 +364,12 @@ def read_http_body_response(rfile, headers, limit):
     '''
     read the HTTP body from a server response.
     '''
-    all = u'close' in get_header_tokens(headers, u'connection')
+    all = 'close' in get_header_tokens(headers, 'connection')
     return read_http_body(500, rfile, headers, all, limit)
 
 
 def parse_response_line(line):
-    parts = line.strip().split(u' ', 2)
+    parts = line.strip().split(' ', 2)
     if len(parts) == 2: # handle missing message gracefully
         parts.append(b'')
     if len(parts) != 3:
@@ -387,24 +387,24 @@ def read_response(rfile, method, body_size_limit):
     return an (httpversion, code, msg, headers, content) tuple.
     '''
     line = rfile.readline().decode()
-    if line in (u'\r\n', u'\n'): # Possible leftover from previous message
+    if line in ('\r\n', '\n'): # Possible leftover from previous message
         line = rfile.readline()
     if not line:
-        raise HttpErrorConnClosed(502, u'Server disconnect.')
+        raise HttpErrorConnClosed(502, 'Server disconnect.')
     parts = parse_response_line(line)
     if not parts:
-        raise HttpError(502, u'Invalid server response: %r' % line)
+        raise HttpError(502, 'Invalid server response: %r' % line)
     proto, code, msg = parts
     httpversion = parse_http_protocol(proto)
     if httpversion is None:
-        raise HttpError(502, u'Invalid HTTP version in line: %s' % proto)
+        raise HttpError(502, 'Invalid HTTP version in line: %s' % proto)
     headers = read_headers(rfile)
     if headers is None:
-        raise HttpError(502, u'Invalid headers.')
+        raise HttpError(502, 'Invalid headers.')
     if code >= 100 and code <= 199:
         return read_response(rfile, method, body_size_limit)
-    if method == u'HEAD' or code == 204 or code == 304:
-        content = u''
+    if method == 'HEAD' or code == 204 or code == 304:
+        content = ''
     else:
         content = read_http_body_response(rfile, headers, body_size_limit)
     return httpversion, code, msg, headers, content
