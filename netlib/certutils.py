@@ -3,7 +3,10 @@ import os, ssl, time, datetime, tempfile, shutil
 from pyasn1.type import univ, constraint, char, namedtype, tag
 from pyasn1.codec.der.decoder import decode
 from pyasn1.error import PyAsn1Error
-import OpenSSL
+try:
+    import OpenSSL
+except ImportError:
+    from . import openssl_compat as OpenSSL
 try:
     import tcp
 except ImportError:
@@ -11,7 +14,7 @@ except ImportError:
 
 def create_ca():
     key = OpenSSL.crypto.PKey()
-    key.generate_key(OpenSSL.crypto.TYPE_RSA, 1024)
+    key.generate_key(OpenSSL.crypto.TYPE_RSA, 2048)
     ca = OpenSSL.crypto.X509()
     ca.set_serial_number(int(time.time()*10000))
     ca.set_version(2)
@@ -91,7 +94,7 @@ def dummy_cert(ca, commonname, sans):
         ss.append("DNS: %s"%i)
     ss = ", ".join(ss)
 
-    raw = file(ca, "rb").read()
+    raw = open(ca, "rb").read()
     ca = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, raw)
     key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, raw)
 
