@@ -28,7 +28,7 @@ def cleanBin(s, fixspacing=False):
             parts.append(c)
         else:
             parts.append(b'.')
-    return b''.join(parts)
+    return b''.join(parts).decode()  # return as string
 
 
 def hexdump(s):
