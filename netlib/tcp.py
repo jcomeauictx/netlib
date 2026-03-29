@@ -84,7 +84,7 @@ class _FileLike:
         """
         if not self.is_logging():
             raise ValueError("Not logging!")
-        return "".join(self._log)
+        return b''.join(self._log)
 
     def add_log(self, v):
         if self.is_logging():
