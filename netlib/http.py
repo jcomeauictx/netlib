@@ -275,7 +275,7 @@ def parse_init_connect(line):
     if method.upper() != 'CONNECT':
         return None
     try:
-        host, port = url.split(b':')
+        host, port = url.split(':')
     except ValueError:
         return None
     try:
