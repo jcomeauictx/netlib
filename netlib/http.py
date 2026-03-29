@@ -241,7 +241,7 @@ def parse_http_basic_auth(s):
 
 
 def assemble_http_basic_auth(scheme, username, password):
-    v = binascii.b2a_base64(username + b':' + password)
+    v = binascii.b2a_base64(username + ':' + password)
     return scheme + b' ' + v
 
 
