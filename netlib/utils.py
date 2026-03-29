@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+# python2/3 compatibility
+
 def isascii(s):
     '''
     ensures string is valid ASCII
@@ -17,15 +19,16 @@ def cleanBin(s, fixspacing=False):
     replaced with a placeholder.
     '''
     parts = []
-    for i in s:
-        o = ord(i)
+    for i in range(len(s)):
+        c = s[i:i + 1]
+        o = ord(c)
         if (o > 31 and o < 127):
-            parts.append(i)
-        elif i in '\n\t' and not fixspacing:
-            parts.append(i)
+            parts.append(c)
+        elif c in '\n\t' and not fixspacing:
+            parts.append(c)
         else:
-            parts.append('.')
-    return ''.join(parts)
+            parts.append(b'.')
+    return b''.join(parts)
 
 
 def hexdump(s):
