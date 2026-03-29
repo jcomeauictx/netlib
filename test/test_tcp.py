@@ -184,8 +184,8 @@ class TestSNI(test.ServerTestBase):
     def test_echo(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
-        c.convert_to_ssl(sni="foo.com")
-        assert c.rfile.readline() == "foo.com"
+        c.convert_to_ssl(sni=b'foo.com')
+        assert c.rfile.readline() == b'foo.com'
 
 
 class TestSSLDisconnect(test.ServerTestBase):
