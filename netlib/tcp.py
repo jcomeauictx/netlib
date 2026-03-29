@@ -123,6 +123,7 @@ class Writer(_FileLike):
                     self.add_log(v)
                     return self.o.sendall(v)
                 else:
+                    v = v.encode()
                     r = self.o.write(v)
                     self.add_log(v[:r])
                     return r
