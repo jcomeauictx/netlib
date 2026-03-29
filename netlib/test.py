@@ -1,6 +1,23 @@
 from __future__ import unicode_literals
-import threading, Queue, cStringIO
-import tcp, certutils
+import threading
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
+try:
+    import cStringIO
+except ImportError:
+    import io as cStringIO
+try:
+    import tcp, certutils
+except ImportError:
+    from . import tcp, certutils
+import logging
+try:
+    file
+except NameError:
+    file = open
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.WARNING)
 
 class ServerThread(threading.Thread):
     def __init__(self, server):
@@ -49,6 +66,7 @@ class TServer(tcp.TCPServer):
         self.last_handler = None
 
     def handle_connection(self, request, client_address):
+        logging.debug('handling connection for %s, %s', request, client_address)
         h = self.handler_klass(request, client_address, self)
         self.last_handler = h
         if self.ssl:

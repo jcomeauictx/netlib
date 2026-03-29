@@ -2,7 +2,10 @@ from __future__ import unicode_literals
 import os
 from netlib import certutils
 import tutils
-
+try:
+    file
+except NameError:
+    file = open
 
 def test_dummy_ca():
     with tutils.tmpdir() as d:
@@ -59,11 +62,11 @@ class TestDummyCert:
 class TestSSLCert:
     def test_simple(self):
         c = certutils.SSLCert.from_pem(file(tutils.test_data.path("data/text_cert"), "rb").read())
-        assert c.cn == "google.com"
+        assert c.cn == b'google.com'
         assert len(c.altnames) == 436
 
         c = certutils.SSLCert.from_pem(file(tutils.test_data.path("data/text_cert_2"), "rb").read())
-        assert c.cn == "www.inode.co.nz"
+        assert c.cn == b'www.inode.co.nz'
         assert len(c.altnames) == 2
         assert c.digest("sha1")
         assert c.notbefore

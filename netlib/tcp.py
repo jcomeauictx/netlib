@@ -8,6 +8,10 @@ try:
     import certutils
 except ImportError:
     from . import certutils  # python3 syntax
+try:
+    file
+except NameError:
+    file = open
 
 SSLv2_METHOD = SSL.SSLv2_METHOD
 SSLv3_METHOD = SSL.SSLv3_METHOD
@@ -83,7 +87,7 @@ class _FileLike:
         """
         if not self.is_logging():
             raise ValueError("Not logging!")
-        return "".join(self._log)
+        return b''.join(self._log)
 
     def add_log(self, v):
         if self.is_logging():
@@ -94,6 +98,10 @@ class _FileLike:
 
 
 class Writer(_FileLike):
+    '''
+    bytestream writer
+    '''
+
     def flush(self):
         """
             May raise NetLibDisconnect
@@ -105,12 +113,13 @@ class Writer(_FileLike):
                 raise NetLibDisconnect(str(v))
 
     def write(self, v):
-        """
-            May raise NetLibDisconnect
-        """
+        '''
+        may raise NetLibDisconnect
+        '''
         if v:
+            logging.debug('attempting to write %r', v)
             try:
-                if hasattr(self.o, "sendall"):
+                if hasattr(self.o, 'sendall'):
                     self.add_log(v)
                     return self.o.sendall(v)
                 else:
@@ -122,6 +131,9 @@ class Writer(_FileLike):
 
 
 class Reader(_FileLike):
+    '''
+    bytestream reader
+    '''
     def read(self, length):
         """
             If length is -1, we read until connection closes.
@@ -180,7 +192,7 @@ class Reader(_FileLike):
                 break
             else:
                 result += ch
-                if ch == b'\n':
+                if ch in b'\r\n':
                     break
         return result
 
@@ -267,6 +279,10 @@ class BaseHandler:
     rbufsize = -1
     wbufsize = -1
     def __init__(self, connection, client_address, server):
+        logging.debug(
+            'handling connection %s, %s, %s',
+            connection, client_address, server
+        )
         self.connection = connection
         self.rfile = Reader(self.connection.makefile('rb', self.rbufsize))
         self.wfile = Writer(self.connection.makefile('wb', self.wbufsize))
