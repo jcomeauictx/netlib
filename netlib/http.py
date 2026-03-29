@@ -251,7 +251,7 @@ def parse_init(line):
     '''
     logging.debug('parse_init %r', line)
     try:
-        method, url, protocol = line.decode().split()
+        method, url, protocol = line.rstrip().decode().split()
     except ValueError:
         return None
     httpversion = parse_http_protocol(protocol)
