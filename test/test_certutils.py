@@ -66,7 +66,7 @@ class TestSSLCert:
         assert len(c.altnames) == 436
 
         c = certutils.SSLCert.from_pem(file(tutils.test_data.path("data/text_cert_2"), "rb").read())
-        assert c.cn == "www.inode.co.nz"
+        assert c.cn == b'www.inode.co.nz'
         assert len(c.altnames) == 2
         assert c.digest("sha1")
         assert c.notbefore
