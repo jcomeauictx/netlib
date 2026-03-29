@@ -1,6 +1,9 @@
 from __future__ import print_function, unicode_literals
 import select, socket, threading, sys, time, traceback, logging
-from OpenSSL import SSL
+try:
+    from OpenSSL import SSL
+except ImportError:
+    import ssl as SSL
 try:
     import certutils
 except ImportError:
