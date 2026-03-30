@@ -15,6 +15,7 @@ try:
     string.split('')
 except AttributeError:
     string.split = str.split
+    string.rsplit = str.rsplit
 
 class HttpError(Exception):
     def __init__(self, code, msg):
