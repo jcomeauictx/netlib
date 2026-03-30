@@ -140,15 +140,15 @@ def test_parse_http_protocol():
 
 
 def test_parse_init_connect():
-    assert http.parse_init_connect("CONNECT host.com:443 HTTP/1.0")
-    assert not http.parse_init_connect("C\xfeONNECT host.com:443 HTTP/1.0")
-    assert not http.parse_init_connect("CONNECT \0host.com:443 HTTP/1.0")
-    assert not http.parse_init_connect("CONNECT host.com:444444 HTTP/1.0")
-    assert not http.parse_init_connect("bogus")
-    assert not http.parse_init_connect("GET host.com:443 HTTP/1.0")
-    assert not http.parse_init_connect("CONNECT host.com443 HTTP/1.0")
-    assert not http.parse_init_connect("CONNECT host.com:443 foo/1.0")
-    assert not http.parse_init_connect("CONNECT host.com:foo HTTP/1.0")
+    assert http.parse_init_connect(br'CONNECT host.com:443 HTTP/1.0')
+    assert not http.parse_init_connect(b'C\xfeONNECT host.com:443 HTTP/1.0')
+    assert not http.parse_init_connect(b'CONNECT \0host.com:443 HTTP/1.0')
+    assert not http.parse_init_connect(b'CONNECT host.com:444444 HTTP/1.0')
+    assert not http.parse_init_connect(b'bogus')
+    assert not http.parse_init_connect(b'GET host.com:443 HTTP/1.0')
+    assert not http.parse_init_connect(b'CONNECT host.com443 HTTP/1.0')
+    assert not http.parse_init_connect(b'CONNECT host.com:443 foo/1.0')
+    assert not http.parse_init_connect(b'CONNECT host.com:foo HTTP/1.0')
 
 
 def test_parse_init_proxy():
