@@ -95,12 +95,15 @@ def test_get_header_tokens():
 
 
 def test_read_http_body_request():
+    '''
+    not sure about either, but `w` at least should probably be bytes
+    '''
     h = odict.ODictCaseless()
     h["expect"] = ["100-continue"]
     r = cStringIO.StringIO("testing")
-    w = cStringIO.StringIO()
+    w = cStringIO.BytesIO()
     assert http.read_http_body_request(r, w, h, (1, 1), None) == ""
-    assert "100 Continue" in w.getvalue()
+    assert "100 Continue" in w.getvalue().decode()
 
 
 def test_read_http_body():
