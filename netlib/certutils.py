@@ -29,16 +29,22 @@ def create_ca():
     ca.set_issuer(ca.get_subject())
     ca.set_pubkey(key)
     ca.add_extensions([
-      OpenSSL.crypto.X509Extension("basicConstraints", True,
-                                   "CA:TRUE"),
-      OpenSSL.crypto.X509Extension("nsCertType", True,
-                                   "sslCA"),
-      OpenSSL.crypto.X509Extension("extendedKeyUsage", True,
-                                    "serverAuth,clientAuth,emailProtection,timeStamping,msCodeInd,msCodeCom,msCTLSign,msSGC,msEFS,nsSGC"
-                                    ),
-      OpenSSL.crypto.X509Extension("keyUsage", False,
-                                   "keyCertSign, cRLSign"),
-      OpenSSL.crypto.X509Extension("subjectKeyIdentifier", False, "hash",
+      # OpenSSL.crypto.X509Extension has args:
+      #  type_name: bytes
+      #  critical: bool
+      #  value: bytes
+      #  subject: 'X509 | None', default None
+      #  issuer: 'X509 | None', default None
+      OpenSSL.crypto.X509Extension(b'basicConstraints', True, b'CA:TRUE'),
+      OpenSSL.crypto.X509Extension(b'nsCertType', True, b'sslCA'),
+      OpenSSL.crypto.X509Extension(
+          b'extendedKeyUsage',
+          True,
+          b'serverAuth,clientAuth,emailProtection,timeStamping,msCodeInd,'
+          b'msCodeCom,msCTLSign,msSGC,msEFS,nsSGC'
+      ),
+      OpenSSL.crypto.X509Extension(b'keyUsage', False, b'keyCertSign, cRLSign'),
+      OpenSSL.crypto.X509Extension(b'subjectKeyIdentifier', False, b'hash',
                                    subject=ca),
       ])
     ca.sign(key, "sha1")
@@ -108,8 +114,9 @@ def dummy_cert(ca, commonname, sans):
     req.set_pubkey(ca.get_pubkey())
     req.sign(key, "sha1")
     if ss:
-        req.add_extensions([OpenSSL.crypto.X509Extension("subjectAltName", True, ss)])
-
+        req.add_extensions([OpenSSL.crypto.X509Extension(
+            b'subjectAltName', True, ss)]
+        )
     cert = OpenSSL.crypto.X509()
     cert.gmtime_adj_notBefore(-3600)
     cert.gmtime_adj_notAfter(60 * 60 * 24 * 30)
@@ -118,7 +125,8 @@ def dummy_cert(ca, commonname, sans):
     cert.set_serial_number(int(time.time()*10000))
     if ss:
         cert.set_version(2)
-        cert.add_extensions([OpenSSL.crypto.X509Extension("subjectAltName", True, ss)])
+        cert.add_extensions([OpenSSL.crypto.X509Extension(
+            b'subjectAltName', True, ss)])
     cert.set_pubkey(req.get_pubkey())
     cert.sign(key, "sha1")
     return SSLCert(cert)
