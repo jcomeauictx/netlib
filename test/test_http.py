@@ -325,6 +325,6 @@ def test_parse_http_basic_auth():
     assert http.parse_http_basic_auth(http.assemble_http_basic_auth(*vals)) == vals
     assert not http.parse_http_basic_auth("")
     assert not http.parse_http_basic_auth("foo bar")
-    v = "basic " + binascii.b2a_base64("foo")
+    v = "basic " + binascii.b2a_base64(b'foo').decode()
     assert not http.parse_http_basic_auth(v)
 
