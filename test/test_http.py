@@ -155,7 +155,7 @@ def test_parse_init_connect():
 
 
 def test_parse_init_proxy():
-    u = "GET http://foo.com:8888/test HTTP/1.1"
+    u = b'GET http://foo.com:8888/test HTTP/1.1'
     m, s, h, po, pa, httpversion = http.parse_init_proxy(u)
     assert m == "GET"
     assert s == "http"
@@ -164,12 +164,12 @@ def test_parse_init_proxy():
     assert pa == "/test"
     assert httpversion == (1, 1)
 
-    u = "G\xfeET http://foo.com:8888/test HTTP/1.1"
+    u = b'G\xfeET http://foo.com:8888/test HTTP/1.1'
     assert not http.parse_init_proxy(u)
 
-    assert not http.parse_init_proxy("invalid")
-    assert not http.parse_init_proxy("GET invalid HTTP/1.1")
-    assert not http.parse_init_proxy("GET http://foo.com:8888/test foo/1.1")
+    assert not http.parse_init_proxy(b'invalid')
+    assert not http.parse_init_proxy(b'GET invalid HTTP/1.1')
+    assert not http.parse_init_proxy(b'GET http://foo.com:8888/test foo/1.1')
 
 
 def test_parse_init_http():
