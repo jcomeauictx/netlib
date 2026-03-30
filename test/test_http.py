@@ -189,7 +189,7 @@ class TestReadHeaders:
         if not verbatim:
             data = textwrap.dedent(data)
             data = data.strip()
-        s = cStringIO.StringIO(data)
+        s = cStringIO.BytesIO(data.encode())
         return http.read_headers(s)
 
     def test_read_simple(self):

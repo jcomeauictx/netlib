@@ -91,11 +91,14 @@ def read_headers(fp):
     '''
     read a set of headers from a file pointer, stopping on a blank line.
     return a ODictCaseless object, or None if headers are invalid.
+
+    this expects *bytes*, not strings, and netlib/test scripts need to
+    account for that.
     '''
     ret = []
     name = ''
     while 1:
-        line = fp.readline()
+        line = fp.readline().decode()
         if line in ('', '\r\n', '\n'):
             break
         if line[0] in ' \t':
@@ -175,7 +178,7 @@ def get_header_tokens(headers, key):
     """
     toks = []
     for i in headers[key]:
-        for j in i.split(b','):
+        for j in i.split(','):
             toks.append(j.strip())
     return toks
 
@@ -250,7 +253,7 @@ def parse_http_basic_auth(s):
 
 
 def assemble_http_basic_auth(scheme, username, password):
-    v = binascii.b2a_base64(username + ':' + password)
+    v = binascii.b2a_base64((username + ':' + password).encode())
     return scheme + b' ' + v
 
 
@@ -380,7 +383,7 @@ def read_http_body_response(rfile, headers, limit):
 def parse_response_line(line):
     parts = line.strip().split(' ', 2)
     if len(parts) == 2: # handle missing message gracefully
-        parts.append(b'')
+        parts.append('')
     if len(parts) != 3:
         return None
     proto, code, msg = parts
