@@ -116,20 +116,22 @@ def read_headers(fp):
 
 
 def read_chunked(code, fp, limit):
-    """
-        Read a chunked HTTP body.
+    '''
+    Read a chunked HTTP body.
 
-        May raise HttpError.
-    """
-    content = b''
+    May raise HttpError.
+    '''
+    content = ''
     total = 0
     while 1:
         line = fp.readline(128)
-        if line == b'':
+        logging.debug('http.read_chunked: pre-content line=%r', line)
+        if line == '':
             raise HttpErrorConnClosed(code, "Connection closed prematurely")
-        if line != b'\r\n' and line != b'\n':
+        if line not in ('\r\n', '\n'):
             try:
                 length = int(line, 16)
+                logging.debug('http.read_chunked: chunk length=%d', length)
             except ValueError:
                 # FIXME: Not strictly correct - this could be from the server, in which
                 # case we should send a 502.
@@ -138,6 +140,7 @@ def read_chunked(code, fp, limit):
                     'Invalid chunked encoding length: %r' % line
                 )
             if not length:
+                logging.debug('http.read_chunked: 0-chunk, end of content')
                 break
             total += length
             if limit is not None and total > limit:
@@ -147,14 +150,19 @@ def read_chunked(code, fp, limit):
                 ) % (limit, total)
                 raise HttpError(code, msg)
             content += fp.read(length)
+            logging.debug('http.read_chunked: content=%r', content)
             line = fp.readline(5)
-            if line != b'\r\n':
+            logging.debug('http.read_chunked: post-content endline=%r', line)
+            if line != '\r\n':
                 raise HttpError(code, 'Malformed chunked body')
     while 1:
         line = fp.readline()
-        if line == b'':
+        logging.debug('http.read_chunked: post-content line=%r', line)
+        if line == '':
+            logging.debug('http.read_chunked: found "" where eol expected')
             raise HttpErrorConnClosed(code, 'Connection closed prematurely')
-        if line == b'\r\n' or line == b'\n':
+        if line in ('\r\n', '\n'):
+            logging.debug('http.read_chunked: closing normally')
             break
     return content
 
