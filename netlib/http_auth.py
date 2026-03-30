@@ -4,7 +4,7 @@ try:
     import contrib.md5crypt as md5crypt
 except ImportError:
     from .contrib import md5crypt  # python3
-import http
+from . import http
 
 
 class NullProxyAuth():

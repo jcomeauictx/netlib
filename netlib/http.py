@@ -15,6 +15,7 @@ try:
     string.split('')
 except AttributeError:
     string.split = str.split
+    string.rsplit = str.rsplit
 
 class HttpError(Exception):
     def __init__(self, code, msg):
@@ -90,20 +91,24 @@ def read_headers(fp):
     '''
     read a set of headers from a file pointer, stopping on a blank line.
     return a ODictCaseless object, or None if headers are invalid.
+
+    test/test_http.py supplies strings not bytes, so I (jc@unternet.net)
+    am assuming that is what this is supposed to be processing. may need
+    to change that assumption.
     '''
     ret = []
-    name = b''
+    name = ''
     while 1:
         line = fp.readline()
-        if not line or line == b'\r\n' or line == b'\n':
+        if not line or line in ('\r\n', '\n'):
             break
-        if line[0] in b' \t':
+        if line[0] in ' \t':
             if not ret:
                 return None
             # continued header
-            ret[-1][1] = ret[-1][1] + b'\r\n ' + line.strip()
+            ret[-1][1] = ret[-1][1] + '\r\n ' + line.strip()
         else:
-            i = line.find(b':')
+            i = line.find(':')
             # We're being liberal in what we accept, here.
             if i > 0:
                 name = line[:i]
@@ -120,13 +125,13 @@ def read_chunked(code, fp, limit):
 
         May raise HttpError.
     """
-    content = b''
+    content = ''
     total = 0
     while 1:
         line = fp.readline(128)
-        if line == b'':
+        if line == '':
             raise HttpErrorConnClosed(code, "Connection closed prematurely")
-        if line != b'\r\n' and line != b'\n':
+        if line not in ('\r\n', '\n'):
             try:
                 length = int(line, 16)
             except ValueError:
@@ -147,13 +152,13 @@ def read_chunked(code, fp, limit):
                 raise HttpError(code, msg)
             content += fp.read(length)
             line = fp.readline(5)
-            if line != b'\r\n':
+            if line != '\r\n':
                 raise HttpError(code, 'Malformed chunked body')
     while 1:
         line = fp.readline()
-        if line == b'':
+        if line == '':
             raise HttpErrorConnClosed(code, 'Connection closed prematurely')
-        if line == b'\r\n' or line == b'\n':
+        if line not in ('\r\n', '\n'):
             break
     return content
 
@@ -166,7 +171,7 @@ def get_header_tokens(headers, key):
     """
     toks = []
     for i in headers[key]:
-        for j in i.split(b','):
+        for j in i.split(','):
             toks.append(j.strip())
     return toks
 
@@ -231,7 +236,8 @@ def parse_http_basic_auth(s):
         return None
     scheme = words[0]
     try:
-        user = binascii.a2b_base64(words[1])
+        # binascii.a2b* returns bytes but caller expects strings
+        user = binascii.a2b_base64(words[1]).decode()
     except binascii.Error:
         return None
     parts = user.split(':')
@@ -241,8 +247,11 @@ def parse_http_basic_auth(s):
 
 
 def assemble_http_basic_auth(scheme, username, password):
-    v = binascii.b2a_base64(username + ':' + password)
-    return scheme + b' ' + v
+    logging.debug('assemble_http_basic_auth: args: %r',
+                  (scheme, username, password))
+    # binascii.b2a_base64 requires bytes under python3
+    v = binascii.b2a_base64((username + ':' + password).encode()).decode()
+    return scheme + ' ' + v
 
 
 def parse_init(line):
@@ -251,7 +260,7 @@ def parse_init(line):
     '''
     logging.debug('parse_init %r', line)
     try:
-        method, url, protocol = line.rstrip().decode().split()
+        method, url, protocol = line.rstrip().split()
     except ValueError:
         return None
     httpversion = parse_http_protocol(protocol)
@@ -354,8 +363,8 @@ def read_http_body_request(rfile, wfile, headers, httpversion, limit):
     if 'expect' in headers:
         # FIXME: Should be forwarded upstream
         if '100-continue' in headers['expect'] and httpversion >= (1, 1):
-            wfile.write(b'HTTP/1.1 100 Continue\r\n')
-            wfile.write(b'\r\n')
+            wfile.write('HTTP/1.1 100 Continue\r\n')
+            wfile.write('\r\n')
             del headers['expect']
     return read_http_body(400, rfile, headers, False, limit)
 
@@ -386,7 +395,7 @@ def read_response(rfile, method, body_size_limit):
     '''
     return an (httpversion, code, msg, headers, content) tuple.
     '''
-    line = rfile.readline().decode()
+    line = rfile.readline()
     if line in ('\r\n', '\n'): # Possible leftover from previous message
         line = rfile.readline()
     if not line:
