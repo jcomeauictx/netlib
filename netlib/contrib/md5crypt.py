@@ -9,6 +9,8 @@
 
 # This port adds no further stipulations.  I forfeit any copyright interest.
 from __future__ import unicode_literals
+import logging
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 try:
     from md5 import md5  # python2
 except ImportError:
@@ -17,21 +19,23 @@ except ImportError:
 def md5crypt(password, salt, magic='$1$'):
     # /* The password first, since that is what is most unknown */ /* Then our magic string */ /* Then the raw salt */
     m = md5()
-    m.update(password + magic + salt)
+    m.update((password + magic + salt).encode())
 
     # /* Then just as many characters of the MD5(pw,salt,pw) */
-    mixin = md5(password + salt + password).digest()
+    mixin = md5((password + salt + password).encode()).digest()
+    #logging.debug('mixin: %r', mixin)
     for i in range(0, len(password)):
-        m.update(mixin[i % 16])
+        byte = mixin[i % 16:(i % 16) + 1]
+        m.update(byte)
 
     # /* Then something really weird... */
     # Also really broken, as far as I can tell.  -m
     i = len(password)
     while i:
         if i & 1:
-            m.update('\x00')
+            m.update(b'\x00')
         else:
-            m.update(password[0])
+            m.update(password[0].encode())
         i >>= 1
 
     final = m.digest()
@@ -40,20 +44,20 @@ def md5crypt(password, salt, magic='$1$'):
     for i in range(1000):
         m2 = md5()
         if i & 1:
-            m2.update(password)
+            m2.update(password.encode())
         else:
             m2.update(final)
 
         if i % 3:
-            m2.update(salt)
+            m2.update(salt.encode())
 
         if i % 7:
-            m2.update(password)
+            m2.update(password.encode())
 
         if i & 1:
             m2.update(final)
         else:
-            m2.update(password)
+            m2.update(password.encode())
 
         final = m2.digest()
 
@@ -63,11 +67,13 @@ def md5crypt(password, salt, magic='$1$'):
 
     rearranged = ''
     for a, b, c in ((0, 6, 12), (1, 7, 13), (2, 8, 14), (3, 9, 15), (4, 10, 5)):
-        v = ord(final[a]) << 16 | ord(final[b]) << 8 | ord(final[c])
+        v = (ord(final[a:a + 1]) << 16 |
+             ord(final[b:b + 1]) << 8 |
+             ord(final[c: c + 1]))
         for i in range(4):
             rearranged += itoa64[v & 0x3f]; v >>= 6
 
-    v = ord(final[11])
+    v = ord(final[11:12])
     for i in range(2):
         rearranged += itoa64[v & 0x3f]; v >>= 6
 
