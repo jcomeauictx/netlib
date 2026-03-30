@@ -18,7 +18,7 @@ except NameError:
 
 def create_ca():
     key = OpenSSL.crypto.PKey()
-    key.generate_key(OpenSSL.crypto.TYPE_RSA, 2048)
+    key.generate_key(OpenSSL.crypto.TYPE_RSA, 1024)
     ca = OpenSSL.crypto.X509()
     ca.set_serial_number(int(time.time()*10000))
     ca.set_version(2)
@@ -29,16 +29,16 @@ def create_ca():
     ca.set_issuer(ca.get_subject())
     ca.set_pubkey(key)
     ca.add_extensions([
-      OpenSSL.crypto.X509Extension(b"basicConstraints", True,
-                                   b"CA:TRUE"),
-      OpenSSL.crypto.X509Extension(b"nsCertType", True,
-                                   b"sslCA"),
-      OpenSSL.crypto.X509Extension(b"extendedKeyUsage", True,
-                                    b"serverAuth,clientAuth,emailProtection,timeStamping,msCodeInd,msCodeCom,msCTLSign,msSGC,msEFS,nsSGC"
+      OpenSSL.crypto.X509Extension("basicConstraints", True,
+                                   "CA:TRUE"),
+      OpenSSL.crypto.X509Extension("nsCertType", True,
+                                   "sslCA"),
+      OpenSSL.crypto.X509Extension("extendedKeyUsage", True,
+                                    "serverAuth,clientAuth,emailProtection,timeStamping,msCodeInd,msCodeCom,msCTLSign,msSGC,msEFS,nsSGC"
                                     ),
-      OpenSSL.crypto.X509Extension(b"keyUsage", False,
-                                   b"keyCertSign, cRLSign"),
-      OpenSSL.crypto.X509Extension(b"subjectKeyIdentifier", False, b"hash",
+      OpenSSL.crypto.X509Extension("keyUsage", False,
+                                   "keyCertSign, cRLSign"),
+      OpenSSL.crypto.X509Extension("subjectKeyIdentifier", False, "hash",
                                    subject=ca),
       ])
     ca.sign(key, "sha1")
@@ -108,7 +108,7 @@ def dummy_cert(ca, commonname, sans):
     req.set_pubkey(ca.get_pubkey())
     req.sign(key, "sha1")
     if ss:
-        req.add_extensions([OpenSSL.crypto.X509Extension(b"subjectAltName", True, ss)])
+        req.add_extensions([OpenSSL.crypto.X509Extension("subjectAltName", True, ss)])
 
     cert = OpenSSL.crypto.X509()
     cert.gmtime_adj_notBefore(-3600)
@@ -118,9 +118,9 @@ def dummy_cert(ca, commonname, sans):
     cert.set_serial_number(int(time.time()*10000))
     if ss:
         cert.set_version(2)
-        cert.add_extensions([OpenSSL.crypto.X509Extension(b"subjectAltName", True, ss)])
+        cert.add_extensions([OpenSSL.crypto.X509Extension("subjectAltName", True, ss)])
     cert.set_pubkey(req.get_pubkey())
-    cert.sign(key, b"sha1")
+    cert.sign(key, "sha1")
     return SSLCert(cert)
 
 
@@ -234,11 +234,11 @@ class SSLCert:
     def keyinfo(self):
         pk = self.x509.get_pubkey()
         types = {
-            OpenSSL.crypto.TYPE_RSA: b"RSA",
-            OpenSSL.crypto.TYPE_DSA: b"DSA",
+            OpenSSL.crypto.TYPE_RSA: "RSA",
+            OpenSSL.crypto.TYPE_DSA: "DSA",
         }
         return (
-            types.get(pk.type(), b"UNKNOWN"),
+            types.get(pk.type(), "UNKNOWN"),
             pk.bits()
         )
 
@@ -246,7 +246,7 @@ class SSLCert:
     def cn(self):
         c = None
         for i in self.subject:
-            if i[0] == b"CN":
+            if i[0] == "CN":
                 c = i[1]
         return c
 
@@ -255,7 +255,7 @@ class SSLCert:
         altnames = []
         for i in range(self.x509.get_extension_count()):
             ext = self.x509.get_extension(i)
-            if ext.get_short_name() == b"subjectAltName":
+            if ext.get_short_name() == "subjectAltName":
                 try:
                     dec = decode(ext.get_data(), asn1Spec=_GeneralNames())
                 except PyAsn1Error:
