@@ -100,11 +100,12 @@ def dummy_cert(ca, commonname, sans):
         Returns cert path if operation succeeded, None if not.
     """
     ss = []
+    # assuming the subject alternate names are provided as strings not bytes
     for i in sans:
-        ss.append("DNS: %s"%i)
-    ss = ", ".join(ss)
+        ss.append('DNS: %s' % i)
+    ss = ', '.join(ss).encode()  # turn it into bytes here
 
-    raw = open(ca, "rb").read()
+    raw = open(ca, 'rb').read()
     ca = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, raw)
     key = OpenSSL.crypto.load_privatekey(OpenSSL.crypto.FILETYPE_PEM, raw)
 
