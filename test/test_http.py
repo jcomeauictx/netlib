@@ -173,19 +173,19 @@ def test_parse_init_proxy():
 
 
 def test_parse_init_http():
-    u = "GET /test HTTP/1.1"
+    u = b'GET /test HTTP/1.1'
     m, u, httpversion = http.parse_init_http(u)
     assert m == "GET"
     assert u == "/test"
     assert httpversion == (1, 1)
 
-    u = "G\xfeET /test HTTP/1.1"
+    u = b'G\xfeET /test HTTP/1.1'
     assert not http.parse_init_http(u)
 
-    assert not http.parse_init_http("invalid")
-    assert not http.parse_init_http("GET invalid HTTP/1.1")
-    assert not http.parse_init_http("GET /test foo/1.1")
-    assert not http.parse_init_http("GET /test\xc0 HTTP/1.1")
+    assert not http.parse_init_http(b'invalid')
+    assert not http.parse_init_http(b'GET invalid HTTP/1.1')
+    assert not http.parse_init_http(b'GET /test foo/1.1')
+    assert not http.parse_init_http(b'GET /test\xc0 HTTP/1.1')
 
 class TestReadHeaders:
     def _read(self, data, verbatim=False):
