@@ -6,6 +6,11 @@ try:
     basestring
 except NameError:
     basestring = str
+try:
+    apply
+except NameError:
+    def apply(obj, args, kwargs):
+        return obj(*args, **kwargs)
 
 
 @contextmanager
@@ -37,8 +42,6 @@ def raises(exc, obj, *args, **kwargs):
     """
     try:
         apply(obj, args, kwargs)
-    except NameError:
-        obj(*args, **kwargs)
     except Exception as v:
         if isinstance(exc, basestring):
             if exc.lower() in str(v).lower():
