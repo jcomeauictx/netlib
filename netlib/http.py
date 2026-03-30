@@ -93,18 +93,18 @@ def read_headers(fp):
     return a ODictCaseless object, or None if headers are invalid.
     '''
     ret = []
-    name = b''
+    name = ''
     while 1:
         line = fp.readline()
-        if not line or line == b'\r\n' or line == b'\n':
+        if line in ('', '\r\n', '\n'):
             break
-        if line[0] in b' \t':
+        if line[0] in ' \t':
             if not ret:
                 return None
             # continued header
-            ret[-1][1] = ret[-1][1] + b'\r\n ' + line.strip()
+            ret[-1][1] = ret[-1][1] + '\r\n ' + line.strip()
         else:
-            i = line.find(b':')
+            i = line.find(':')
             # We're being liberal in what we accept, here.
             if i > 0:
                 name = line[:i]
