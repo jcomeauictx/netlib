@@ -13,6 +13,8 @@ try:
 except NameError:
     file = open
 
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
+
 SSLv2_METHOD = SSL.SSLv2_METHOD
 SSLv3_METHOD = SSL.SSLv3_METHOD
 SSLv23_METHOD = SSL.SSLv23_METHOD
@@ -211,9 +213,10 @@ class TCPClient:
         self.source_address = source_address
 
     def convert_to_ssl(self, cert=None, sni=None, method=TLSv1_METHOD, options=None):
-        """
-            cert: Path to a file containing both client cert and private key.
-        """
+        '''
+        cert: Path to a file containing both client cert and private key.
+        '''
+        logging.debug('TCPClient.convert_to_ssl: starting')
         context = SSL.Context(method)
         if options is not None:
             context.set_options(options)
@@ -323,6 +326,7 @@ class BaseHandler:
         we may be able to make the proper behaviour the default again, but
         until then we're conservative.
         '''
+        logging.debug('BaseHandler.convert_to_ssl: starting')
         ctx = SSL.Context(method)
         if not options is None:
             ctx.set_options(options)

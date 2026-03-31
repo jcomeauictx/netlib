@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
-import re, copy
+import re, copy, logging
 try:
     basestring
 except NameError:
     basestring = str
+
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 
 def safe_subn(pattern, repl, target, *args, **kwargs):
     """
@@ -116,8 +118,9 @@ class ODict:
 
     def __repr__(self):
         elements = []
-        for itm in self.lst:
-            elements.append(itm[0] + ": " + itm[1])
+        logging.debug('ODict.__repr__: self.lst=%s', self.lst)
+        for key, value in self.lst:
+            elements.append('%s:%s' % (key, value))
         elements.append("")
         return "\r\n".join(elements)
 
