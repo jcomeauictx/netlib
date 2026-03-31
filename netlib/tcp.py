@@ -229,6 +229,7 @@ class TCPClient:
         self.connection = SSL.Connection(context, self.connection)
         self.ssl_established = True
         if sni:
+            logging.debug('setting tls host name to %r', sni)
             self.connection.set_tlsext_host_name(sni)
         self.connection.set_connect_state()
         try:
