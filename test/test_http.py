@@ -237,7 +237,7 @@ class TestReadHeaders:
 def test_read_response():
     def tst(data, method, limit):
         data = textwrap.dedent(data)
-        r = cStringIO.StringIO(data)
+        r = cStringIO.BytesIO(data.encode())
         return  http.read_response(r, method, limit)
 
     tutils.raises("server disconnect", tst, "", "GET", None)
