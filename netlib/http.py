@@ -397,10 +397,12 @@ def parse_response_line(line):
 def read_response(rfile, method, body_size_limit):
     '''
     return an (httpversion, code, msg, headers, content) tuple.
+
+    expects bytes and decodes each line as it's being read
     '''
     line = rfile.readline().decode()
     if line in ('\r\n', '\n'): # Possible leftover from previous message
-        line = rfile.readline()
+        line = rfile.readline().decode()
     if not line:
         raise HttpErrorConnClosed(502, 'Server disconnect.')
     parts = parse_response_line(line)
