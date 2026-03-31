@@ -99,7 +99,7 @@ class TestFinishFail(test.ServerTestBase):
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         logging.debug('test_disconnect_in_finish: connected')
-        c.wfile.write('foo\n')
+        c.wfile.write(b'foo\n')
         c.wfile.flush()
         c.rfile.read(4)
         h = self.last_handler
