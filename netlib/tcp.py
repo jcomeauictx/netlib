@@ -296,32 +296,33 @@ class BaseHandler:
         self.ssl_established = False
 
         self.clientcert = None
+        logging.debug('returning connection: %s', self)
 
     def convert_to_ssl(self, cert, key, method=SSLv23_METHOD, options=None, handle_sni=None, request_client_cert=False):
-        """
-            cert: A certutils.SSLCert object.
-            method: One of SSLv2_METHOD, SSLv3_METHOD, SSLv23_METHOD, or TLSv1_METHOD
-            handle_sni: SNI handler, should take a connection object. Server
-            name can be retrieved like this:
+        '''
+        cert: A certutils.SSLCert object.
+        method: SSLv2_METHOD | SSLv3_METHOD | SSLv23_METHOD | TLSv1_METHOD
+        handle_sni: SNI handler, should take a connection object.
+        Server name can be retrieved like this:
 
-                            connection.get_servername()
+            connection.get_servername()
 
-                        And you can specify the connection keys as follows:
+        And you can specify the connection keys as follows:
 
-                            new_context = Context(TLSv1_METHOD)
-                            new_context.use_privatekey(key)
-                            new_context.use_certificate(cert)
-                            connection.set_context(new_context)
+            new_context = Context(TLSv1_METHOD)
+            new_context.use_privatekey(key)
+            new_context.use_certificate(cert)
+            connection.set_context(new_context)
 
-            The request_client_cert argument requires some explanation. We're
-            supposed to be able to do this with no negative effects - if the
-            client has no cert to present, we're notified and proceed as usual.
-            Unfortunately, Android seems to have a bug (tested on 4.2.2) - when
-            an Android client is asked to present a certificate it does not
-            have, it hangs up, which is frankly bogus. Some time down the track
-            we may be able to make the proper behaviour the default again, but
-            until then we're conservative.
-        """
+        The request_client_cert argument requires some explanation. We're
+        supposed to be able to do this with no negative effects - if the
+        client has no cert to present, we're notified and proceed as usual.
+        Unfortunately, Android seems to have a bug (tested on 4.2.2) - when
+        an Android client is asked to present a certificate it does not
+        have, it hangs up, which is frankly bogus. Some time down the track
+        we may be able to make the proper behaviour the default again, but
+        until then we're conservative.
+        '''
         ctx = SSL.Context(method)
         if not options is None:
             ctx.set_options(options)
