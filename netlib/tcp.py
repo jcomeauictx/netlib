@@ -123,7 +123,9 @@ class Writer(_FileLike):
                     self.add_log(v)
                     return self.o.sendall(v)
                 else:
-                    v = v.encode()
+                    logging.debug('%s encoding %r', self, v)
+                    v = v.encode() if hasattr(v, 'encode') else v
+                    logging.debug('%s writing %r', self, v)
                     r = self.o.write(v)
                     self.add_log(v[:r])
                     return r

@@ -69,7 +69,7 @@ class TimeoutHandler(tcp.BaseHandler):
 class TestServer(test.ServerTestBase):
     handler = EchoHandler
     def test_echo(self):
-        testval = b'echo!\n'
+        testval = 'echo!\n'
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         c.wfile.write(testval)
@@ -99,7 +99,7 @@ class TestFinishFail(test.ServerTestBase):
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         logging.debug('test_disconnect_in_finish: connected')
-        c.wfile.write(b'foo\n')
+        c.wfile.write('foo\n')
         c.wfile.flush()
         c.rfile.read(4)
         h = self.last_handler
@@ -110,7 +110,7 @@ class TestFinishFail(test.ServerTestBase):
 class TestDisconnect(test.ServerTestBase):
     handler = EchoHandler
     def test_echo(self):
-        testval = b'echo!\n'
+        testval = 'echo!\n'
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         c.wfile.write(testval)
@@ -130,7 +130,7 @@ class TestServerSSL(test.ServerTestBase):
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
         c.convert_to_ssl(sni="foo.com", options=tcp.OP_ALL)
-        testval = b'echo!\n'
+        testval = 'echo!\n'
         c.wfile.write(testval)
         c.wfile.flush()
         assert c.rfile.readline() == testval
