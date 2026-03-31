@@ -150,7 +150,9 @@ class TestSSLv3Only(test.ServerTestBase):
     def test_failure(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
+        logging.debug('TestSSLv3Only.test_failure: connected')
         tutils.raises(tcp.NetLibError, c.convert_to_ssl, sni=b'foo.com', method=tcp.TLSv1_METHOD)
+        logging.debug('TestSSLv3Only.test_failure: complete')
 
 
 class TestSSLClientCert(test.ServerTestBase):

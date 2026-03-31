@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
-import tempfile, os, shutil
+import tempfile, os, shutil, logging
 from contextlib import contextmanager
 from libpathod import utils
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
+
 try:
     basestring
 except NameError:
@@ -26,21 +28,22 @@ def tmpdir(*args, **kwargs):
 
 
 def raises(exc, obj, *args, **kwargs):
-    """
-        Assert that a callable raises a specified exception.
+    '''
+    Assert that a callable raises a specified exception.
 
-        :exc An exception class or a string. If a class, assert that an
-        exception of this type is raised. If a string, assert that the string
-        occurs in the string representation of the exception, based on a
-        case-insenstivie match.
+    :exc An exception class or a string. If a class, assert that an
+    exception of this type is raised. If a string, assert that the string
+    occurs in the string representation of the exception, based on a
+    case-insenstivie match.
 
-        :obj A callable object.
+    :obj A callable object.
 
-        :args Arguments to be passsed to the callable.
+    :args Arguments to be passsed to the callable.
 
-        :kwargs Arguments to be passed to the callable.
-    """
+    :kwargs Arguments to be passed to the callable.
+    '''
     try:
+        logging.debug('raises() testing %s(*%s, **%s)', obj, args, kwargs)
         apply(obj, args, kwargs)
     except Exception as v:
         if isinstance(exc, basestring):
@@ -48,16 +51,14 @@ def raises(exc, obj, *args, **kwargs):
                 return
             else:
                 raise AssertionError(
-                    "Expected %s, but caught %s"%(
-                        repr(str(exc)), v
-                    )
+                    'Expected %s, but caught %s' % (repr(str(exc)), v)
                 )
         else:
             if isinstance(v, exc):
                 return
             else:
                 raise AssertionError(
-                    "Expected %s, but caught %s %s"%(
+                    'Expected %s, but caught %s %s ' % (
                         exc.__name__, v.__class__.__name__, str(v)
                     )
                 )
