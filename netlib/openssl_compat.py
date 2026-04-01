@@ -282,7 +282,7 @@ class _SSL:
                 # Set up SNI callback
                 def _sni_cb(sslobj, servername, sslctx):
                     # Create a wrapper Connection-like object
-                    self._sni_servername = servername
+                    self._sni_servername = servername.encode('idna')
                     try:
                         self._context._sni_callback(self)
                     except Exception:
