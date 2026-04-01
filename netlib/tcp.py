@@ -197,7 +197,7 @@ class Reader(_FileLike):
                 break
             else:
                 result += ch
-                if ch in b'\r\n':
+                if result.endswith(b'\n'):
                     break
         return result
 
