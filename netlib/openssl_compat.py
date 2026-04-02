@@ -1,5 +1,5 @@
 '''
-openssl_compat.py — drop-in shim for pyOpenSSL using only Python's ssl stdlib
+openssl_compat.py: drop-in shim for pyOpenSSL using only Python's ssl stdlib
 
 Provides:
   - OpenSSL.SSL.Context, Connection, and method/option constants
@@ -29,7 +29,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 # ============================================================
-# OpenSSL.SSL — SSL/TLS context and connection wrappers
+# OpenSSL.SSL: SSL/TLS context and connection wrappers
 # ============================================================
 
 class _SSL:
@@ -37,7 +37,7 @@ class _SSL:
     Namespace mimicking OpenSSL.SSL
     '''
 
-    # Method constants — all map to PROTOCOL_TLS (auto-negotiate)
+    # Method constants -- all map to PROTOCOL_TLS (auto-negotiate)
     # The old specific protocol versions (SSLv2, SSLv3, TLSv1) are
     # disabled/broken in modern Python and modern servers reject them.
     # For a MITM proxy the right behavior is auto-negotiation anyway.
@@ -46,7 +46,7 @@ class _SSL:
     SSLv23_METHOD = ssl.PROTOCOL_TLS
     TLSv1_METHOD = ssl.PROTOCOL_TLS
 
-    # Option constants — provide all that pyOpenSSL exposes
+    # Option constants -- provide all that pyOpenSSL exposes
     # Missing ones get 0 (no-op when OR'd into options bitmask)
     OP_ALL = getattr(ssl, 'OP_ALL', 0x80000BFF)
     OP_CIPHER_SERVER_PREFERENCE = getattr(
@@ -117,7 +117,7 @@ class _SSL:
             self._ctx.check_hostname = False
             self._ctx.verify_mode = ssl.CERT_NONE
             self._sni_callback = None
-            # Deferred cert/key loading — pyOpenSSL allows setting
+            # Deferred cert/key loading -- pyOpenSSL allows setting
             # key and cert separately; stdlib ssl needs them together.
             self._key_file = None
             self._key_pem = None
@@ -451,7 +451,7 @@ SSL = _SSL
 
 
 # ============================================================
-# OpenSSL.crypto — certificate and key operations via openssl CLI
+# OpenSSL.crypto: certificate and key operations via openssl CLI
 # ============================================================
 
 FILETYPE_PEM = 1
@@ -1241,7 +1241,7 @@ def _realize_cert(x509):
     issuer_cert_pem = None
     issuer_key_pem = None
     if not is_self_signed:
-        # Would need CA cert/key — for now treat as self-signed
+        # Would need CA cert/key -- for now treat as self-signed
         pass
 
     cert_pem = _generate_cert_with_openssl(
