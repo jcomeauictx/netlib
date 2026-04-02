@@ -25,8 +25,8 @@ def create_ca():
     ca = OpenSSL.crypto.X509()
     ca.set_serial_number(int(time.time()*10000))
     ca.set_version(2)
-    ca.get_subject().CN = "mitmproxy"
-    ca.get_subject().O = "mitmproxy"
+    ca.get_subject().CN = b'mitmproxy'
+    ca.get_subject().O = b'mitmproxy'
     ca.gmtime_adj_notBefore(0)
     ca.gmtime_adj_notAfter(24 * 60 * 60 * 720)
     ca.set_issuer(ca.get_subject())
