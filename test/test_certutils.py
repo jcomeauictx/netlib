@@ -39,18 +39,18 @@ class TestCertStore:
                     logging.debug('test cert %s: %r', ca, testfile.read())
             c = certutils.CertStore()
             logging.debug('TestCertStore.test_create_tmp: c=%r', vars(c))
-            assert c.get_cert("foo.com", [], ca)
-            assert c.get_cert("foo.com", [], ca)
-            assert c.get_cert("*.foo.com", [], ca)
+            assert c.get_cert(b'foo.com', [], ca)
+            assert c.get_cert(b'foo.com', [], ca)
+            assert c.get_cert(b'*.foo.com', [], ca)
 
     def test_check_domain(self):
         c = certutils.CertStore()
-        assert c.check_domain("foo")
-        assert c.check_domain("\x01foo")
-        assert not c.check_domain("\xfefoo")
-        assert not c.check_domain("xn--\0")
-        assert not c.check_domain("foo..foo")
-        assert not c.check_domain("foo/foo")
+        assert c.check_domain(b'foo')
+        assert c.check_domain(b'\x01foo')
+        assert not c.check_domain(b'\xfefoo')
+        assert not c.check_domain(b'xn--\0')
+        assert not c.check_domain(b'foo..foo')
+        assert not c.check_domain(b'foo/foo')
 
 
 class TestDummyCert:
@@ -60,8 +60,8 @@ class TestDummyCert:
             assert certutils.dummy_ca(cacert)
             r = certutils.dummy_cert(
                 cacert,
-                "foo.com",
-                ["one.com", "two.com", "*.three.com"]
+                b'foo.com',
+                [b'one.com', b'two.com', b'*.three.com']
             )
             assert r.cn == "foo.com"
 

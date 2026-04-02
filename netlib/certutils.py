@@ -1,8 +1,11 @@
 from __future__ import unicode_literals
-import os, ssl, time, datetime, tempfile, shutil
+import os, ssl, time, datetime, tempfile, shutil, logging
 from pyasn1.type import univ, constraint, char, namedtype, tag
 from pyasn1.codec.der.decoder import decode
 from pyasn1.error import PyAsn1Error
+
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
+
 try:
     import OpenSSL
 except ImportError:
@@ -89,12 +92,12 @@ def dummy_ca(path):
     return True
 
 
-def dummy_cert(ca, commonname, sans):
+def dummy_cert(ca, name, sans):
     """
         Generates and writes a certificate to fp.
 
         ca: Path to the certificate authority file, or None.
-        commonname: Common name for the generated certificate.
+        name: Common name for the generated certificate.
         sans: A list of Subject Alternate Names.
 
         Returns cert path if operation succeeded, None if not.
@@ -111,7 +114,7 @@ def dummy_cert(ca, commonname, sans):
 
     req = OpenSSL.crypto.X509Req()
     subj = req.get_subject()
-    subj.CN = commonname
+    subj.CN = name
     req.set_pubkey(ca.get_pubkey())
     req.sign(key, "sha1")
     if ss:
@@ -140,23 +143,30 @@ class CertStore:
     def __init__(self):
         self.certs = {}
 
-    def check_domain(self, commonname):
+    def check_domain(self, name):
+        '''
+        check that common name is valid
+
+        * must decode as 'idna' format
+        * must decode as 'ascii' format
+        * must not contain `..` nor `/`
+        '''
         try:
-            commonname.decode("idna")
-            commonname.decode("ascii")
+            name.decode("idna")
+            name.decode("ascii")
         except:
             return False
-        if ".." in commonname:
+        if b'..' in name:
             return False
-        if "/" in commonname:
+        if b'/' in name:
             return False
         return True
 
-    def get_cert(self, commonname, sans, cacert):
+    def get_cert(self, name, sans, cacert):
         """
             Returns an SSLCert object.
 
-            commonname: Common name for the generated certificate. Must be a
+            name: Common name for the generated certificate. Must be a
             valid, plain-ASCII, IDNA-encoded domain name.
 
             sans: A list of Subject Alternate Names.
@@ -165,12 +175,15 @@ class CertStore:
 
             Return None if the certificate could not be found or generated.
         """
-        if not self.check_domain(commonname):
+        logging.debug('CertStore.get_cert requested for %r', name)
+        if not self.check_domain(name):
+            logging.debug('CertStore.get_cert: name %r not in store', name)
             return None
-        if commonname in self.certs:
-            return self.certs[commonname]
-        c = dummy_cert(cacert, commonname, sans)
-        self.certs[commonname] = c
+        if name in self.certs:
+            return self.certs[name]
+        logging.debug('CertStore.get_cert: creating dummy cert for %r', name)
+        c = dummy_cert(cacert, name, sans)
+        self.certs[name] = c
         return c
 
 
