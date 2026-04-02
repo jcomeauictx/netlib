@@ -1,7 +1,10 @@
 from __future__ import unicode_literals
-import os
+import os, logging
 from netlib import certutils
 import tutils
+
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
+
 try:
     file
 except NameError:
@@ -31,7 +34,11 @@ class TestCertStore:
         with tutils.tmpdir() as d:
             ca = os.path.join(d, "ca")
             assert certutils.dummy_ca(ca)
+            if __debug__:
+                with open(ca, 'rb') as testfile:
+                    logging.debug('test cert %s: %r', ca, testfile.read())
             c = certutils.CertStore()
+            logging.debug('TestCertStore.test_create_tmp: c=%r', vars(c))
             assert c.get_cert("foo.com", [], ca)
             assert c.get_cert("foo.com", [], ca)
             assert c.get_cert("*.foo.com", [], ca)
