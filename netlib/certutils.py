@@ -268,7 +268,8 @@ class SSLCert:
     def cn(self):
         c = None
         for i in self.subject:
-            if i[0] == "CN":
+            #logging.debug('SSLCert.cn: subject: %r', i)
+            if i[0] == b'CN':
                 c = i[1]
         return c
 

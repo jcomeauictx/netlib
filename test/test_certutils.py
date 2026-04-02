@@ -63,7 +63,9 @@ class TestDummyCert:
                 b'foo.com',
                 [b'one.com', b'two.com', b'*.three.com']
             )
-            assert r.cn == "foo.com"
+            #logging.debug('TestDummyCert.test_with_ca: r: %s', vars(r))
+            logging.debug('TestDummyCert.test_with_ca: r.cn: %r', r.cn)
+            assert r.cn == b'foo.com'
 
 
 class TestSSLCert:
