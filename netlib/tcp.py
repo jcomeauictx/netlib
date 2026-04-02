@@ -167,7 +167,7 @@ class Reader(_FileLike):
             except SSL.SysCallError:
                 raise NetLibDisconnect
             except SSL.Error as v:
-                raise NetLibSSLError(v.message)
+                raise NetLibSSLError(str(v))
             self.first_byte_timestamp = self.first_byte_timestamp or time.time()
             if not data:
                 break
