@@ -279,7 +279,7 @@ def test_read_response():
         foo
     """
     logging.debug('test_read_response: tst(data): %r', tst(data))
-    assert tst(data)[4] == 'foo'
+    assert tst(data)[4] == b'foo'
     assert tst(data, 'HEAD')[4] == ''
 
     data = """
