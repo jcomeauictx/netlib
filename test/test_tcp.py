@@ -272,26 +272,26 @@ class TestFileLike:
         s = cStringIO.BytesIO(b'1234567890abcdefghijklmnopqrstuvwxyz')
         s = tcp.Reader(s)
         s.BLOCKSIZE = 2
-        assert s.read(1) == '1'
-        assert s.read(2) == '23'
-        assert s.read(3) == '456'
-        assert s.read(4) == '7890'
+        assert s.read(1) == b'1'
+        assert s.read(2) == b'23'
+        assert s.read(3) == b'456'
+        assert s.read(4) == b'7890'
         d = s.read(-1)
-        assert d.startswith('abc') and d.endswith('xyz')
+        assert d.startswith(b'abc') and d.endswith(b'xyz')
 
     def test_wrap(self):
         s = cStringIO.BytesIO(b'foobar\nfoobar')
         s.flush()
         s = tcp.Reader(s)
-        assert s.readline() == 'foobar\n'
-        assert s.readline() == 'foobar'
+        assert s.readline() == b'foobar\n'
+        assert s.readline() == b'foobar'
         # Test __getattr__
         assert s.isatty
 
     def test_limit(self):
         s = cStringIO.BytesIO(b'foobar\nfoobar')
         s = tcp.Reader(s)
-        assert s.readline(3) == 'foo'
+        assert s.readline(3) == b'foo'
 
     def test_limitless(self):
         s = cStringIO.BytesIO(b'f' * (50 * 1024))

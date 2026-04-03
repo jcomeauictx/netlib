@@ -20,6 +20,8 @@ def cleanBin(s, fixspacing=False):
 
     takes bytes, returns a string
     '''
+    if not isinstance(s, bytes):
+        raise ValueError('cleanBin requires bytes and returns strings')
     parts = []
     for i in range(len(s)):
         c = s[i:i + 1]
@@ -45,6 +47,8 @@ def hexdump(s):
      '............UUUU'  # "clean" binary output
     )]
     '''
+    if not isinstance(s, bytes):
+        raise ValueError('hexdump must be called with bytes object')
     parts = []
     chunksize = 16
     hexsize = (chunksize * 3) - 1  # spaces between each hexbyte
