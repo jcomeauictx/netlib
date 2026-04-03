@@ -400,9 +400,15 @@ def read_response(rfile, method, body_size_limit):
 
     expects bytes and decodes each line as it's being read
     '''
-    line = rfile.readline().decode()
+    encoding = 'utf-8'  # assume utf8
+    raw = rfile.readline()
+    try:
+        line = raw.decode(encoding)
+    except UnicodeDecodeError:
+        line = raw.decode('latin-1')  # this matches any byte value
+        encoding = 'latin-1'
     if line in ('\r\n', '\n'): # Possible leftover from previous message
-        line = rfile.readline().decode()
+        line = rfile.readline().decode(encoding)
     if not line:
         raise HttpErrorConnClosed(502, 'Server disconnect.')
     parts = parse_response_line(line)

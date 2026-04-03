@@ -189,6 +189,11 @@ def test_parse_init_http():
 
 class TestReadHeaders:
     def _read(self, data, verbatim=False):
+        '''
+        data being fed is strings (you can see it immediately below)
+
+        but it probably has to be encoded to bytes for http.read_headers()
+        '''
         if not verbatim:
             data = textwrap.dedent(data)
             data = data.strip()
@@ -272,6 +277,7 @@ def test_read_response():
 
         foo
     """
+    logging.debug('test_read_response: tst(data): %r', tst(data))
     assert tst(data, "GET", None)[4] == 'foo'
     assert tst(data, "HEAD", None)[4] == ''
 
