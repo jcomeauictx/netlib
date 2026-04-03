@@ -120,7 +120,7 @@ class ODict:
         elements = []
         logging.debug('ODict.__repr__: self.lst=%s', self.lst)
         for key, value in self.lst:
-            elements.append('%s:%s' % (key, value))
+            elements.append('%s: %s' % (key, value))
         elements.append("")
         return "\r\n".join(elements)
 

@@ -332,9 +332,11 @@ class BaseHandler:
         logging.debug('BaseHandler.convert_to_ssl: starting')
         ctx = SSL.Context(method)
         if not options is None:
+            logging.debug('BaseHandler.convert_to_ssl: setting options')
             ctx.set_options(options)
         if handle_sni:
             # SNI callback happens during do_handshake()
+            logging.debug('BaseHandler.convert_to_ssl: setting callback')
             ctx.set_tlsext_servername_callback(handle_sni)
         ctx.use_privatekey_file(key)
         ctx.use_certificate(cert.x509)
@@ -346,11 +348,13 @@ class BaseHandler:
         self.ssl_established = True
         self.connection.set_accept_state()
         try:
+            logging.debug('BaseHandler.convert_to_ssl: handshaking')
             self.connection.do_handshake()
         except SSL.Error as v:
-            raise NetLibError("SSL handshake error: %s"%str(v))
+            raise NetLibError("SSL handshake error: %s" % str(v))
         self.rfile.set_descriptor(self.connection)
         self.wfile.set_descriptor(self.connection)
+        logging.debug('BaseHandler.convert_to_ssl: complete')
 
     def finish(self):
         self.finished = True

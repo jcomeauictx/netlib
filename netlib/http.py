@@ -398,8 +398,10 @@ def parse_response_line(line):
     splits response line into, e.g., ('http://1.1', 200, 'OK')
 
     expects bytes and returns strings
+    NOTE: some of the nosetests seem to generate random bytes, so
+    use latin-1 decoder rather than attempt utf-8.
     '''
-    parts = line.decode().strip().split(' ', 2)
+    parts = line.decode('latin-1').strip().split(' ', 2)
     if len(parts) == 2: # handle missing message gracefully
         parts.append('')
     if len(parts) != 3:
