@@ -94,6 +94,8 @@ def read_headers(fp):
 
     this expects *bytes*, not strings, and netlib/test scripts need to
     account for that.
+
+    it *returns* headers as strings in an ODictCaseless object.
     '''
     ret = []
     name = ''
@@ -207,7 +209,12 @@ def read_http_body(code, rfile, headers, all, limit):
             # case we should send a 502.
             raise HttpError(code, "Invalid content-length header: %s"%headers["content-length"])
         if limit is not None and l > limit:
-            raise HttpError(code, "HTTP Body too large. Limit is %s, content-length was %s"%(limit, l))
+            raise HttpError(
+                code,
+                "HTTP Body too large. Limit is %s, content-length was %s" % (
+                    limit, l
+                )
+            )
         content = rfile.read(l)
     elif all:
         content = rfile.read(limit if limit else -1)
@@ -238,6 +245,12 @@ def parse_http_protocol(s):
 
 
 def parse_http_basic_auth(s):
+    '''
+    parse scheme, username, and password from basic auth
+
+    expects a string and returns strings (?)
+    (NOTE: binascii.a2b_base64 accepts *either* bytes or strings)
+    '''
     words = s.split()
     if len(words) != 2:
         return None
@@ -374,14 +387,19 @@ def read_http_body_request(rfile, wfile, headers, httpversion, limit):
 
 def read_http_body_response(rfile, headers, limit):
     '''
-    read the HTTP body from a server response.
+    read the HTTP body from a server response. it will be a bytes object
     '''
     all = 'close' in get_header_tokens(headers, 'connection')
     return read_http_body(500, rfile, headers, all, limit)
 
 
 def parse_response_line(line):
-    parts = line.strip().split(' ', 2)
+    '''
+    splits response line into, e.g., ('http://1.1', 200, 'OK')
+
+    expects bytes and returns strings
+    '''
+    parts = line.decode().strip().split(' ', 2)
     if len(parts) == 2: # handle missing message gracefully
         parts.append('')
     if len(parts) != 3:
@@ -398,17 +416,12 @@ def read_response(rfile, method, body_size_limit):
     '''
     return an (httpversion, code, msg, headers, content) tuple.
 
-    expects bytes and decodes each line as it's being read
+    expects bytes, and returns bytes
     '''
-    encoding = 'utf-8'  # assume utf8
-    raw = rfile.readline()
-    try:
-        line = raw.decode(encoding)
-    except UnicodeDecodeError:
-        line = raw.decode('latin-1')  # this matches any byte value
-        encoding = 'latin-1'
-    if line in ('\r\n', '\n'): # Possible leftover from previous message
-        line = rfile.readline().decode(encoding)
+    endlines = (b'\r\n', b'\n')
+    line = rfile.readline()
+    if line in endlines: # Possible leftover from previous message
+        line = rfile.readline()
     if not line:
         raise HttpErrorConnClosed(502, 'Server disconnect.')
     parts = parse_response_line(line)
