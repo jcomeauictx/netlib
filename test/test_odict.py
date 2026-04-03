@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
+import logging
 from netlib import odict
 import tutils
 
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 
 class TestODict:
     def setUp(self):
@@ -22,6 +24,7 @@ class TestODict:
             "\r\n"
         ]
         out = repr(self.od)
+        logging.debug('test_dictToHeader1: out=%r, expected=%r', out, expected)
         for i in expected:
             assert out.find(i) >= 0
 
@@ -30,6 +33,8 @@ class TestODict:
         expected1 = "one: uno\r\n"
         expected2 = "\r\n"
         out = repr(self.od)
+        logging.debug('test_dictToHeader1: out=%r, expected=%r',
+                      out, [expected1, expected2])
         assert out.find(expected1) >= 0
         assert out.find(expected2) >= 0
 

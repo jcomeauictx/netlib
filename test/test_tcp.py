@@ -74,7 +74,10 @@ class TestServer(test.ServerTestBase):
         c.connect()
         c.wfile.write(testval)
         c.wfile.flush()
-        assert c.rfile.readline() == testval
+        seen = c.rfile.readline().decode()
+        logging.debug('TestServer.test_echo: testval=%r, seen=%r',
+                      testval, seen)
+        assert seen == testval
 
 
 
@@ -115,7 +118,10 @@ class TestDisconnect(test.ServerTestBase):
         c.connect()
         c.wfile.write(testval)
         c.wfile.flush()
-        assert c.rfile.readline() == testval
+        seen = c.rfile.readline().decode()
+        logging.debug('TestServer.test_echo: testval=%r, seen=%r',
+                      testval, seen)
+        assert seen == testval
 
 
 class TestServerSSL(test.ServerTestBase):
@@ -133,7 +139,10 @@ class TestServerSSL(test.ServerTestBase):
         testval = 'echo!\n'
         c.wfile.write(testval)
         c.wfile.flush()
-        assert c.rfile.readline() == testval
+        seen = c.rfile.readline().decode()
+        logging.debug('TestServer.test_echo: testval=%r, seen=%r',
+                      testval, seen)
+        assert seen == testval
 
     def test_get_remote_cert(self):
         assert certutils.get_remote_cert("127.0.0.1", self.port, None).digest("sha1")

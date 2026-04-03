@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import textwrap, binascii
+import textwrap, binascii, logging
 try:
     import cStringIO
 except ImportError:
@@ -7,6 +7,7 @@ except ImportError:
 from netlib import http, odict
 import tutils
 
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 
 def test_httperror():
     e = http.HttpError(404, "Not found")
