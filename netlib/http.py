@@ -419,6 +419,8 @@ def read_response(rfile, method, body_size_limit):
     return an (httpversion, code, msg, headers, content) tuple.
 
     expects bytes, and returns bytes
+    FIXME: temporarily reverting to returning strings, to debug
+    server hang on SSL handshake
     '''
     endlines = (b'\r\n', b'\n')
     line = rfile.readline()
@@ -426,7 +428,7 @@ def read_response(rfile, method, body_size_limit):
         line = rfile.readline()
     if not line:
         raise HttpErrorConnClosed(502, 'Server disconnect.')
-    parts = parse_response_line(line)
+    parts = parse_response_line(line.decode('latin-1'))
     if not parts:
         raise HttpError(502, 'Invalid server response: %r' % line)
     proto, code, msg = parts
