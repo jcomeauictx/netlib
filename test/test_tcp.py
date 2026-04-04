@@ -119,7 +119,7 @@ class TestDisconnect(test.ServerTestBase):
         c.wfile.write(testval)
         c.wfile.flush()
         seen = c.rfile.readline().decode()
-        logging.debug('TestServer.test_echo: testval=%r, seen=%r',
+        logging.debug('TestDisconnect.test_echo: testval=%r, seen=%r',
                       testval, seen)
         assert seen == testval
 
@@ -140,7 +140,7 @@ class TestServerSSL(test.ServerTestBase):
         c.wfile.write(testval)
         c.wfile.flush()
         seen = c.rfile.readline().decode()
-        logging.debug('TestServer.test_echo: testval=%r, seen=%r',
+        logging.debug('TestServerSSL.test_echo: testval=%r, seen=%r',
                       testval, seen)
         assert seen == testval
 
@@ -200,9 +200,14 @@ class TestSNI(test.ServerTestBase):
         v3_only = False
     )
     def test_echo(self):
+        # hangs on python2 as of some time April 1-3 2026
+        logging.debug('TestSNI.test_echo: starting')
         c = tcp.TCPClient("127.0.0.1", self.port)
+        logging.debug('TestSNI.test_echo: connecting')
         c.connect()
+        logging.debug('TestSNI.test_echo: convert_to_ssl')
         c.convert_to_ssl(sni=b'foo.com')
+        logging.debug('TestSNI.test_echo: done convert_to_ssl')
         assert c.rfile.readline() == b'foo.com'
 
 
