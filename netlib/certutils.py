@@ -279,9 +279,11 @@ class SSLCert:
         for i in range(self.x509.get_extension_count()):
             ext = self.x509.get_extension(i)
             if ext.get_short_name() == "subjectAltName":
+                logging.debug('raw altnames: %r', ext.get_data())
                 try:
                     dec = decode(ext.get_data(), asn1Spec=_GeneralNames())
                 except PyAsn1Error:
+                    logging.error('PyAsn1Error decoding altnames')
                     continue
                 for i in dec[0]:
                     altnames.append(i[0].asOctets())
