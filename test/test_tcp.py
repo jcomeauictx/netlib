@@ -72,6 +72,7 @@ class TestServer(test.ServerTestBase):
         testval = 'echo!\n'
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
+        c.settimeout(1)  # attempt to stop hanging python2 nosetests
         c.wfile.write(testval)
         c.wfile.flush()
         seen = c.rfile.readline().decode()
@@ -135,6 +136,7 @@ class TestServerSSL(test.ServerTestBase):
     def test_echo(self):
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
+        c.settimeout(1)  # attempt to stop hanging python2 nosetests
         c.convert_to_ssl(sni=b'foo.com', options=tcp.OP_ALL)
         testval = 'echo!\n'
         c.wfile.write(testval)
@@ -145,6 +147,7 @@ class TestServerSSL(test.ServerTestBase):
         assert seen == testval
 
     def test_get_remote_cert(self):
+        self.settimeout(1)  # attempt to stop hanging python2 nosetests
         assert certutils.get_remote_cert("127.0.0.1", self.port, None).digest("sha1")
 
 
@@ -176,6 +179,7 @@ class TestSSLClientCert(test.ServerTestBase):
     def test_clientcert(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
+        c.settimeout(1)  # attempting to stop hanging python2 nosetests
         c.convert_to_ssl(cert=tutils.test_data.path(
             "data/clientcert/client.pem")
         )
@@ -205,6 +209,7 @@ class TestSNI(test.ServerTestBase):
         c = tcp.TCPClient("127.0.0.1", self.port)
         logging.debug('TestSNI.test_echo: connecting')
         c.connect()
+        c.settimeout(1)  # added in attempt to prevent hang python2 nosetests
         logging.debug('TestSNI.test_echo: convert_to_ssl')
         c.convert_to_ssl(sni=b'foo.com')
         logging.debug('TestSNI.test_echo: done convert_to_ssl')
@@ -222,6 +227,7 @@ class TestSSLDisconnect(test.ServerTestBase):
     def test_echo(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
+        c.settimeout(1)  # attempt to stop hanging python2 nosetests
         c.convert_to_ssl()
         # Excercise SSL.ZeroReturnError
         c.rfile.read(10)
@@ -270,6 +276,7 @@ class TestSSLTimeOut(test.ServerTestBase):
     def test_timeout_client(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
+        c.settimeout(1)  # attempt to stop hanging python2 nosetests
         c.convert_to_ssl()
         c.settimeout(0.1)
         tutils.raises(tcp.NetLibTimeout, c.rfile.read, 10)
