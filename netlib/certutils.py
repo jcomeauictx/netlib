@@ -276,8 +276,11 @@ class SSLCert:
     @property
     def altnames(self):
         altnames = []
-        for i in range(self.x509.get_extension_count()):
+        count = self.x509.get_extension_count()
+        logging.debug('SSLCert.altnames: count=%s', count)
+        for i in range(count or 0):
             ext = self.x509.get_extension(i)
+            logging.debug('extension: %r', vars(ext))
             if ext.get_short_name() == "subjectAltName":
                 logging.debug('raw altnames: %r', ext.get_data())
                 try:
