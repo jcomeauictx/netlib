@@ -290,7 +290,8 @@ class SSLCert:
                     dec = decode(data, asn1Spec=_GeneralNames())
                     #logging.debug('decoded altnames: %r', dec)
                 except PyAsn1Error:
-                    logging.error('PyAsn1Error decoding altnames')
+                    logging.warning('PyAsn1Error decoding altnames, ignoring')
+                    logging.debug('raw altnames: %r', data)
                     continue
                 for i in dec[0]:
                     altnames.append(i[0].asOctets())

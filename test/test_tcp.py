@@ -217,11 +217,16 @@ class TestSNI(test.ServerTestBase):
         c = tcp.TCPClient("127.0.0.1", self.port)
         logging.debug('TestSNI.test_echo: connecting')
         c.connect()
-        c.settimeout(1)  # added in attempt to prevent hang python2 nosetests
+        c.settimeout(3)  # added in attempt to prevent hang python2 nosetests
         logging.debug('TestSNI.test_echo: convert_to_ssl')
+        logging.debug('TestSNI.test_echo: if this is the last'
+                      ' TestSNI.test_echo debugging message you see,'
+                      ' it probably means the connection timed out')
         c.convert_to_ssl(sni=b'foo.com')
         logging.debug('TestSNI.test_echo: done convert_to_ssl')
-        assert c.rfile.readline() == b'foo.com'
+        line = c.rfile.readline()
+        logging.debug('TestSNI.test_echo: line=%r', line)
+        assert line == b'foo.com'
 
 
 class TestSSLDisconnect(test.ServerTestBase):
