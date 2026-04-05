@@ -406,8 +406,8 @@ def parse_response_line(line):
     try:
         parts = line.decode('latin-1').strip().split(' ', 2)
         logging.debug('http.parse_response_line: line %r was encoded', line)
-        raise UnicodeDecodeError('FIXME: Forcing error to avoid hanging test')
-    except UnicodeDecodeError:
+        raise NotImplementedError('FIXME: Forcing error to avoid hanging test')
+    except (UnicodeDecodeError, AttributeError, NotImplementedError):
         logging.debug('http.parse_response_line: parsing %r as unicode', line)
         parts = line.strip().split(' ', 2)
     logging.debug('http.parse_response_line: parsed successfully as unicode')

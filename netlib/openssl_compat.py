@@ -309,7 +309,8 @@ class _SSL:
 
             ctx = self._context._ctx
 
-            if self._context._sni_callback:
+            # python2.7 ssl context didn't have sni_callback
+            if self._context._sni_callback and hasattr(ctx, 'sni_callback'):
                 # Set up SNI callback
                 def _sni_cb(sslobj, servername, sslctx):
                     # Create a wrapper Connection-like object
