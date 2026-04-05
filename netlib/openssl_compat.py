@@ -24,6 +24,10 @@ import datetime
 import struct
 import hashlib
 import logging
+try:
+    from io import BytesIO
+except ImportError:
+    from cStringIO import StringIO as BytesIO
 
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,15 +38,20 @@ try:
 except AttributeError:
     logging.warning('monkeypatching subprocess.run for python2')
     def run(*args, **kwargs):
-        if 'capture_output' in kwargs:
-            kwargs.pop('capture_output')
+        communicate_kwargs = {}
+        for keyword in ['capture_output', 'timeout']:
+            if keyword in kwargs:
+                kwargs.pop(keyword)
+        if 'input' in kwargs:
+            kwargs['stdin'] = subprocess.PIPE
+            communicate_kwargs = {'input': kwargs.pop('input')}
         process = subprocess.Popen(
             *args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             **kwargs
         )
-        stdout, stderr = process.communicate()
+        stdout, stderr = process.communicate(**communicate_kwargs)
         returncode = process.returncode
         return type(b'result', (), {
             'returncode': returncode,
@@ -547,7 +556,7 @@ class PKey:
         return 0
 
 
-class X509Name:
+class X509Name(object):
     '''
     Wraps an X.509 subject/issuer name with attribute-style access.
     '''
@@ -556,7 +565,7 @@ class X509Name:
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
-            super().__setattr__(name, value)
+            super(X509Name, self).__setattr__(name, value)
         else:
             self._components[name] = value
 
