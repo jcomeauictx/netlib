@@ -4,6 +4,10 @@ try:
     import cStringIO
 except ImportError:
     import io as cStringIO
+try:
+    from io import BytesIO
+except ImportError:
+    BytesIO = cStringIO.StringIO
 from netlib import http, odict
 import tutils
 
@@ -102,7 +106,7 @@ def test_read_http_body_request():
     h = odict.ODictCaseless()
     h["expect"] = ["100-continue"]
     r = cStringIO.StringIO("testing")
-    w = cStringIO.BytesIO()
+    w = BytesIO()
     assert http.read_http_body_request(r, w, h, (1, 1), None) == ""
     assert "100 Continue" in w.getvalue().decode()
 
@@ -198,7 +202,7 @@ class TestReadHeaders:
         if not verbatim:
             data = textwrap.dedent(data)
             data = data.strip()
-        s = cStringIO.BytesIO(data.encode())
+        s = BytesIO(data.encode())
         return http.read_headers(s)
 
     def test_read_simple(self):
@@ -243,7 +247,7 @@ class TestReadHeaders:
 def test_read_response():
     def tst(data, method='GET', limit=None):
         data = textwrap.dedent(data)
-        r = cStringIO.BytesIO(data.encode())
+        r = BytesIO(data.encode())
         return  http.read_response(r, method, limit)
 
     tutils.raises("server disconnect", tst, "", "GET", None)

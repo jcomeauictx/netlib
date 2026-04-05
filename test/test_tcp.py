@@ -8,6 +8,10 @@ try:
     import cStringIO
 except ImportError:
     import io as cStringIO
+try:
+    from io import BytesIO
+except ImportError:
+    BytesIO = cStringIO.StringIO
 from netlib import tcp, certutils, test
 import mock
 import tutils
@@ -290,7 +294,7 @@ class TestTCPClient:
 
 class TestFileLike:
     def test_blocksize(self):
-        s = cStringIO.BytesIO(b'1234567890abcdefghijklmnopqrstuvwxyz')
+        s = BytesIO(b'1234567890abcdefghijklmnopqrstuvwxyz')
         s = tcp.Reader(s)
         s.BLOCKSIZE = 2
         assert s.read(1) == b'1'
@@ -301,7 +305,7 @@ class TestFileLike:
         assert d.startswith(b'abc') and d.endswith(b'xyz')
 
     def test_wrap(self):
-        s = cStringIO.BytesIO(b'foobar\nfoobar')
+        s = BytesIO(b'foobar\nfoobar')
         s.flush()
         s = tcp.Reader(s)
         assert s.readline() == b'foobar\n'
@@ -310,18 +314,18 @@ class TestFileLike:
         assert s.isatty
 
     def test_limit(self):
-        s = cStringIO.BytesIO(b'foobar\nfoobar')
+        s = BytesIO(b'foobar\nfoobar')
         s = tcp.Reader(s)
         assert s.readline(3) == b'foo'
 
     def test_limitless(self):
-        s = cStringIO.BytesIO(b'f' * (50 * 1024))
+        s = BytesIO(b'f' * (50 * 1024))
         s = tcp.Reader(s)
         ret = s.read(-1)
         assert len(ret) == 50 * 1024
 
     def test_readlog(self):
-        s = cStringIO.BytesIO(b'foobar\nfoobar')
+        s = BytesIO(b'foobar\nfoobar')
         s = tcp.Reader(s)
         assert not s.is_logging()
         s.start_log()
@@ -338,7 +342,7 @@ class TestFileLike:
         tutils.raises(ValueError, s.get_log)
 
     def test_writelog(self):
-        s = cStringIO.BytesIO()
+        s = BytesIO()
         s = tcp.Writer(s)
         s.start_log()
         assert s.is_logging()
@@ -371,7 +375,7 @@ class TestFileLike:
         assert not s.first_byte_timestamp
 
     def test_first_byte_timestamp_updated_on_read(self):
-        s = cStringIO.BytesIO(b'foobar\nfoobar')
+        s = BytesIO(b'foobar\nfoobar')
         s = tcp.Reader(s)
         s.read(1)
         assert s.first_byte_timestamp
@@ -380,7 +384,7 @@ class TestFileLike:
         assert s.first_byte_timestamp == expected
 
     def test_first_byte_timestamp_updated_on_readline(self):
-        s = cStringIO.BytesIO(b'foobar\nfoobar\nfoobar')
+        s = BytesIO(b'foobar\nfoobar\nfoobar')
         s = tcp.Reader(s)
         s.readline()
         assert s.first_byte_timestamp
