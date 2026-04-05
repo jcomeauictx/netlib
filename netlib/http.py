@@ -401,9 +401,16 @@ def parse_response_line(line):
     NOTE: some of the nosetests seem to generate random bytes, so
     use latin-1 decoder rather than attempt utf-8.
     '''
-    #parts = line.decode('latin-1').strip().split(' ', 2)
-    # FIXME: momentarily reverting to code that didn't hang on handshake
-    parts = line.strip().split(' ', 2)
+    # NOTE: since failure here can cause pathod to hang, accept both
+    # strings and bytes in order to continue testing
+    try:
+        parts = line.decode('latin-1').strip().split(' ', 2)
+        logging.debug('http.parse_response_line: line %r was encoded', line)
+        raise UnicodeDecodeError('FIXME: Forcing error to avoid hanging test')
+    except UnicodeDecodeError:
+        logging.debug('http.parse_response_line: parsing %r as unicode', line)
+        parts = line.strip().split(' ', 2)
+    logging.debug('http.parse_response_line: parsed successfully as unicode')
     if len(parts) == 2: # handle missing message gracefully
         parts.append('')
     if len(parts) != 3:
