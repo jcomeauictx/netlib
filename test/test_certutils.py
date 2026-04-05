@@ -72,8 +72,8 @@ class TestSSLCert:
     def test_simple(self):
         c = certutils.SSLCert.from_pem(file(tutils.test_data.path("data/text_cert"), "rb").read())
         assert c.cn == b'google.com'
-        logging.debug('TestSSLCert.test_simple: cert c: %r', vars(c))
-        logging.debug('TestSSLCert.test_simple: cert c: %s', c.altnames)
+        #logging.debug('TestSSLCert.test_simple: cert c: %r', vars(c))
+        #logging.debug('TestSSLCert.test_simple: cert c: %s', c.altnames)
         assert len(c.altnames) == 436
 
         c = certutils.SSLCert.from_pem(file(tutils.test_data.path("data/text_cert_2"), "rb").read())

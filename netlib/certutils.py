@@ -232,12 +232,12 @@ class SSLCert:
 
     @property
     def notbefore(self):
-        t = self.x509.get_notBefore()
+        t = self.x509.get_notBefore().decode()
         return datetime.datetime.strptime(t, "%Y%m%d%H%M%SZ")
 
     @property
     def notafter(self):
-        t = self.x509.get_notAfter()
+        t = self.x509.get_notAfter().decode()
         return datetime.datetime.strptime(t, "%Y%m%d%H%M%SZ")
 
     @property
@@ -277,14 +277,18 @@ class SSLCert:
     def altnames(self):
         altnames = []
         count = self.x509.get_extension_count()
-        logging.debug('SSLCert.altnames: count=%s', count)
+        #logging.debug('SSLCert.altnames: count=%s', count)
         for i in range(count or 0):
             ext = self.x509.get_extension(i)
-            logging.debug('extension: %r', vars(ext))
-            if ext.get_short_name() == "subjectAltName":
-                logging.debug('raw altnames: %r', ext.get_data())
+            #logging.debug('extension: %r', dir(ext))
+            # each extension has get_short_name, get_critical, get_data
+            short_name = ext.get_short_name()
+            data = ext.get_data()
+            #logging.debug('short_name: %r, data: %r', short_name, data)
+            if short_name == b'subjectAltName':
                 try:
-                    dec = decode(ext.get_data(), asn1Spec=_GeneralNames())
+                    dec = decode(data, asn1Spec=_GeneralNames())
+                    #logging.debug('decoded altnames: %r', dec)
                 except PyAsn1Error:
                     logging.error('PyAsn1Error decoding altnames')
                     continue
