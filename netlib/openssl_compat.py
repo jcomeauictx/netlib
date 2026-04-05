@@ -25,9 +25,31 @@ import struct
 import hashlib
 import logging
 
-logging.basicConfig()
+logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 logger = logging.getLogger(__name__)
 
+try:
+    subprocess.run
+    logging.warning('subprocess.run exists, why is not OpenSSL installed?')
+except AttributeError:
+    logging.warning('monkeypatching subprocess.run for python2')
+    def run(*args, **kwargs):
+        if 'capture_output' in kwargs:
+            kwargs.pop('capture_output')
+        process = subprocess.Popen(
+            *args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            **kwargs
+        )
+        stdout, stderr = process.communicate()
+        returncode = process.returncode
+        return type(b'result', (), {
+            'returncode': returncode,
+            'stdout': stdout,
+            'stderr': stderr
+        })
+    subprocess.run = run
 # ============================================================
 # OpenSSL.SSL: SSL/TLS context and connection wrappers
 # ============================================================
@@ -1285,3 +1307,13 @@ class _crypto_module:
 
 
 crypto = _crypto_module()
+
+if __name__ == '__main__':
+    # run some tests
+    result = subprocess.run([
+        'ls',
+        os.path.dirname(__file__)],
+        capture_output=True
+    )
+    logging.debug('result: %r', result.stdout)
+    assert b'openssl_compat.py' in result.stdout
