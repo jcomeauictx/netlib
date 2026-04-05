@@ -12,27 +12,33 @@ def isascii(s):
     return True
 
 
-def cleanBin(s, fixspacing=False):
+def clean_bin(s, fixspacing=False):
     '''
     cleans binary data to make it safe to display. if fixspacing is True,
     tabs, newlines and so forth will be maintained, if not, they will be
     replaced with a placeholder.
 
-    takes bytes, returns a string
+    takes bytes or a string, returns same type as it got
     '''
-    if not isinstance(s, bytes):
-        raise ValueError('cleanBin requires bytes and returns strings')
+    if isinstance(s, bytes):
+        replacement = b'.'
+        joiner = b''
+        pass_ok = b'\t\n'
+    else:
+        replacement = '.'
+        joiner = ''
+        pass_ok = '\t\n'
     parts = []
     for i in range(len(s)):
         c = s[i:i + 1]
         o = ord(c)
         if (o > 31 and o < 127):
             parts.append(c)
-        elif c in b'\n\t' and not fixspacing:
+        elif c in pass_ok and not fixspacing:
             parts.append(c)
         else:
-            parts.append(b'.')
-    return b''.join(parts).decode()  # return as string
+            parts.append(replacement)
+    return joiner.join(parts)
 
 
 def hexdump(s):
@@ -58,6 +64,6 @@ def hexdump(s):
         hexstring = ' '.join('%.2x' % ord(part[i:i + 1])
                              for i in range(len(part)))
         parts.append(
-            (offset, hexstring.rjust(hexsize), cleanBin(part, True))
+            (offset, hexstring.rjust(hexsize), clean_bin(part, True))
         )
     return parts
