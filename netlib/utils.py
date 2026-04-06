@@ -64,6 +64,6 @@ def hexdump(s):
         hexstring = ' '.join('%.2x' % ord(part[i:i + 1])
                              for i in range(len(part)))
         parts.append(
-            (offset, hexstring.rjust(hexsize), clean_bin(part, True))
+            (offset, hexstring.rjust(hexsize), clean_bin(part, True).decode())
         )
     return parts
