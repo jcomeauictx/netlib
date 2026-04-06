@@ -109,6 +109,7 @@ class TestFinishFail(test.ServerTestBase):
     def test_disconnect_in_finish(self):
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
+        c.settimeout(1.0)
         logging.debug('test_disconnect_in_finish: connected')
         c.wfile.write('foo\n')
         c.wfile.flush()
