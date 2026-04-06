@@ -415,6 +415,9 @@ class _SSL:
                 if 'EOF' in str(e):
                     return b''
                 raise _SSL.Error(str(e))
+            except AttributeError as e:
+                logging.error('Connection._ssl_socket uninitialized? %s', e)
+                return b''
 
         def shutdown(self):
             '''
