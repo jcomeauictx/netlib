@@ -126,10 +126,16 @@ class Writer(_FileLike):
                     return self.o.sendall(v)
                 else:
                     logging.debug('%s encoding %r', self, v)
-                    v = v.encode() if hasattr(v, 'encode') else v
-                    logging.debug('%s writing %r', self, v)
-                    r = self.o.write(v)
-                    self.add_log(v[:r])
+                    # the following ought to work on python2 and 3
+                    # using latin-1 because it seems pathod is generating
+                    # random bytes
+                    if not isinstance(v, bytes):
+                        encoded = v.encode('latin-1')
+                    else:
+                        encoded = v
+                    logging.debug('%s writing %r', self, encoded)
+                    r = self.o.write(encoded)
+                    self.add_log(encoded[:r])
                     return r
             except (SSL.Error, socket.error) as v:
                 raise NetLibDisconnect(str(v))
