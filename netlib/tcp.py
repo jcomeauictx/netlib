@@ -119,7 +119,7 @@ class Writer(_FileLike):
         may raise NetLibDisconnect
         '''
         if v:
-            logging.debug('attempting to write %r', v)
+            #logging.debug('attempting to write %r', v)
             try:
                 if hasattr(self.o, 'sendall'):
                     self.add_log(v)
