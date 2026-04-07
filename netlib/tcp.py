@@ -125,7 +125,7 @@ class Writer(_FileLike):
                     self.add_log(v)
                     return self.o.sendall(v)
                 else:
-                    logging.debug('%s encoding %r', self, v)
+                    #logging.debug('%s encoding %r', self, v)
                     # the following ought to work on python2 and 3
                     # using latin-1 because it seems pathod is generating
                     # random bytes
@@ -133,7 +133,7 @@ class Writer(_FileLike):
                         encoded = v.encode('latin-1')
                     else:
                         encoded = v
-                    logging.debug('%s writing %r', self, encoded)
+                    #logging.debug('%s writing %r', self, encoded)
                     r = self.o.write(encoded)
                     self.add_log(encoded[:r])
                     return r
