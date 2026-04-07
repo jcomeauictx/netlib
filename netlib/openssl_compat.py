@@ -24,6 +24,8 @@ import datetime
 import struct
 import hashlib
 import logging
+from ssl import SSLError as Error, SSLZeroReturnError as ZeroReturnError, \
+        SSLWantReadError as WantReadError, SSLSyscallError as SysCallError
 try:
     from io import BytesIO
 except ImportError:
@@ -110,31 +112,6 @@ class _SSL:
     VERIFY_NONE = ssl.CERT_NONE
     VERIFY_PEER = ssl.CERT_OPTIONAL
     VERIFY_FAIL_IF_NO_PEER_CERT = ssl.CERT_REQUIRED
-
-    # Exception classes
-    class Error(ssl.SSLError):
-        '''
-        Generic SSL error, wrapping ssl.SSLError
-        '''
-        pass
-
-    class ZeroReturnError(ssl.SSLZeroReturnError):
-        '''
-        SSL connection returned zero (clean shutdown)
-        '''
-        pass
-
-    class WantReadError(ssl.SSLWantReadError):
-        '''
-        SSL wants to read more data
-        '''
-        pass
-
-    class SysCallError(ssl.SSLSyscallError):
-        '''
-        SSL system call error
-        '''
-        pass
 
     class Context:
         '''
@@ -291,6 +268,12 @@ class _SSL:
                 if sn:
                     return sn.encode('ascii') if isinstance(sn, str) else sn
             return None
+
+        def getsockname(self):
+            '''
+            get name from underlying socket
+            '''
+            return self._socket.getsockname()
 
         def set_context(self, new_context):
             '''
@@ -1328,5 +1311,5 @@ if __name__ == '__main__':
         os.path.dirname(__file__)],
         capture_output=True
     )
-    logging.debug('result: %r', result.stdout)
+    #logging.debug('result: %r', result.stdout)
     assert b'openssl_compat.py' in result.stdout
