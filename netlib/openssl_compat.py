@@ -24,8 +24,6 @@ import datetime
 import struct
 import hashlib
 import logging
-from ssl import SSLError as Error, SSLZeroReturnError as ZeroReturnError, \
-        SSLWantReadError as WantReadError, SSLSyscallError as SysCallError
 try:
     from io import BytesIO
 except ImportError:
@@ -112,6 +110,12 @@ class _SSL:
     VERIFY_NONE = ssl.CERT_NONE
     VERIFY_PEER = ssl.CERT_OPTIONAL
     VERIFY_FAIL_IF_NO_PEER_CERT = ssl.CERT_REQUIRED
+
+    # Errors
+    Error = ssl.SSLError
+    ZeroReturnError = ssl.SSLZeroReturnError
+    WantReadError = ssl.SSLWantReadError
+    SysCallError = ssl.SSLSyscallError
 
     class Context:
         '''
