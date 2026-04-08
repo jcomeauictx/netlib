@@ -375,6 +375,7 @@ class BaseHandler:
             pass
 
     def handle(self): # pragma: no cover
+        logging.error('Subclasses must implement handle()')
         raise NotImplementedError
 
     def settimeout(self, n):
