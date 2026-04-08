@@ -379,8 +379,8 @@ def read_http_body_request(rfile, wfile, headers, httpversion, limit):
     if 'expect' in headers:
         # FIXME: Should be forwarded upstream
         if '100-continue' in headers['expect'] and httpversion >= (1, 1):
-            wfile.write(b'HTTP/1.1 100 Continue\r\n')
-            wfile.write(b'\r\n')
+            wfile.write('HTTP/1.1 100 Continue\r\n')
+            wfile.write('\r\n')
             del headers['expect']
     return read_http_body(400, rfile, headers, False, limit)
 
