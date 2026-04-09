@@ -3,13 +3,10 @@ import os, ssl, time, datetime, tempfile, shutil, logging
 from pyasn1.type import univ, constraint, char, namedtype, tag
 from pyasn1.codec.der.decoder import decode
 from pyasn1.error import PyAsn1Error
+import OpenSSL
 
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
 
-try:
-    import OpenSSL
-except ImportError:
-    from . import openssl_compat as OpenSSL
 try:
     import tcp
 except ImportError:
