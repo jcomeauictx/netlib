@@ -231,7 +231,12 @@ class SSLCert:
         return OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, self.x509)
 
     def digest(self, name):
-        return self.x509.digest(name)
+        # Python3 throws AttributeError, trying to encode name
+        try:
+            return self.x509.digest(name)
+        except AttributeError:
+            logging.warning('SSLCert.digest: decoding name %r', name)
+            return self.x509.digest(name.decode())
 
     @property
     def issuer(self):
