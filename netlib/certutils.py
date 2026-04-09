@@ -47,7 +47,7 @@ def create_ca():
       OpenSSL.crypto.X509Extension(b'subjectKeyIdentifier', False, b'hash',
                                    subject=ca),
       ])
-    ca.sign(key, "sha1")
+    ca.sign(key, b'sha1')  # openssl requires bytes (python2 str)
     return key, ca
 
 
@@ -113,7 +113,7 @@ def dummy_cert(ca, name, sans):
     subj = req.get_subject()
     subj.CN = name
     req.set_pubkey(ca.get_pubkey())
-    req.sign(key, "sha1")
+    req.sign(key, b'sha1')  # openssl requires bytes (python2 str)
     if ss:
         req.add_extensions([OpenSSL.crypto.X509Extension(
             b'subjectAltName', True, ss)]
@@ -129,7 +129,7 @@ def dummy_cert(ca, name, sans):
         cert.add_extensions([OpenSSL.crypto.X509Extension(
             b'subjectAltName', True, ss)])
     cert.set_pubkey(req.get_pubkey())
-    cert.sign(key, "sha1")
+    cert.sign(key, b'sha1')  # openssl requires bytes (python2 str)
     return SSLCert(cert)
 
 

@@ -76,10 +76,11 @@ class TestSSLCert:
         #logging.debug('TestSSLCert.test_simple: cert c: %s', c.altnames)
         assert len(c.altnames) == 436
 
-        c = certutils.SSLCert.from_pem(file(tutils.test_data.path("data/text_cert_2"), "rb").read())
+        c = certutils.SSLCert.from_pem(file(tutils.test_data.path(
+            "data/text_cert_2"), "rb").read())
         assert c.cn == b'www.inode.co.nz'
         assert len(c.altnames) == 2
-        assert c.digest("sha1")
+        assert c.digest(b'sha1')
         assert c.notbefore
         assert c.notafter
         assert c.subject
