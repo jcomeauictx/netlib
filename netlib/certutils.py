@@ -16,6 +16,16 @@ try:
 except NameError:
     file = open
 
+def ca_signkey(ca, key, hashtype):
+    '''
+    OpenSSL supposed to require bytes, but older Python2 versions try to
+    re-encode those bytes. We will attempt to send unicode in that case.
+    '''
+    try:
+        ca.sign(key, hashtype)
+    except (AttributeError, ValueError) as problem:
+        ca.sign(key, hashtype.decode())
+
 def create_ca():
     key = OpenSSL.crypto.PKey()
     key.generate_key(OpenSSL.crypto.TYPE_RSA, 1024)
@@ -47,7 +57,7 @@ def create_ca():
       OpenSSL.crypto.X509Extension(b'subjectKeyIdentifier', False, b'hash',
                                    subject=ca),
       ])
-    ca.sign(key, b'sha1')  # openssl requires bytes (python2 str)
+    ca_signkey(ca, key, b'sha1')
     return key, ca
 
 
@@ -113,7 +123,7 @@ def dummy_cert(ca, name, sans):
     subj = req.get_subject()
     subj.CN = name
     req.set_pubkey(ca.get_pubkey())
-    req.sign(key, b'sha1')  # openssl requires bytes (python2 str)
+    ca_signkey(req, key, b'sha1')
     if ss:
         req.add_extensions([OpenSSL.crypto.X509Extension(
             b'subjectAltName', True, ss)]
@@ -129,7 +139,7 @@ def dummy_cert(ca, name, sans):
         cert.add_extensions([OpenSSL.crypto.X509Extension(
             b'subjectAltName', True, ss)])
     cert.set_pubkey(req.get_pubkey())
-    cert.sign(key, b'sha1')  # openssl requires bytes (python2 str)
+    ca_signkey(cert, key, b'sha1')  # openssl requires bytes (python2 str)
     return SSLCert(cert)
 
 
