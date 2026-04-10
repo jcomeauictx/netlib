@@ -91,7 +91,9 @@ class TestServer(test.ServerTestBase):
 
 class FinishFailHandler(tcp.BaseHandler):
     def handle(self):
+        logging.debug('FinishFailHandler.handle: attempting readline()')
         v = self.rfile.readline()
+        logging.debug('FinishFailHandler.handle: attempting write()')
         self.wfile.write(v)
         self.wfile.flush()
         o = mock.MagicMock()
