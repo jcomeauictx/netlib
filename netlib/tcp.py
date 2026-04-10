@@ -1,5 +1,5 @@
 from __future__ import print_function, unicode_literals
-import select, socket, threading, sys, time, traceback, logging
+import select, socket, threading, sys, os, time, traceback, logging
 from OpenSSL import SSL
 try:
     import certutils
@@ -11,6 +11,14 @@ except NameError:
     file = open
 
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
+
+COMMAND = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+logging.debug('COMMAND: %s', COMMAND)
+if COMMAND.startswith('nose'):
+    DEFAULT_TIMEOUT = 5.0
+    logging.warning('setting timeout to %s for nosetests', DEFAULT_TIMEOUT)
+else:
+    DEFAULT_TIMEOUT = None
 
 SSLv2_METHOD = SSL.SSLv2_METHOD
 SSLv3_METHOD = SSL.SSLv3_METHOD
@@ -143,9 +151,9 @@ class Reader(_FileLike):
     bytestream reader
     '''
     def read(self, length):
-        """
-            If length is -1, we read until connection closes.
-        """
+        '''
+        If length is -1, we read until connection closes.
+        '''
         result = b''
         start = time.time()
         while length == -1 or length > 0:
@@ -186,6 +194,13 @@ class Reader(_FileLike):
         return result
 
     def readline(self, size = None):
+        if hasattr(self.o, 'gettimeout'):
+            if self.o.gettimeout is None:
+                logging.debug('Reader.readline: setting timeout to %s',
+                              DEFAULT_TIMEOUT)
+                self.o.settimeout(DEFAULT_TIMEOUT)
+        else:
+            logging.debug('Reader.readline: no timeout possible, may hang')
         result = b''
         bytes_read = 0
         while True:
