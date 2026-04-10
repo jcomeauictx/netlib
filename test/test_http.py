@@ -212,7 +212,7 @@ class TestReadHeaders:
             \r\n
         """
         h = self._read(data)
-        assert h.lst == [["Header", "one"], ["Header2", "two"]]
+        assert h.lst == [("Header", "one"), ("Header2", "two")]
 
     def test_read_multi(self):
         data = """
@@ -221,7 +221,7 @@ class TestReadHeaders:
             \r\n
         """
         h = self._read(data)
-        assert h.lst == [["Header", "one"], ["Header", "two"]]
+        assert h.lst == [("Header", "one"), ("Header", "two")]
 
     def test_read_continued(self):
         data = """
@@ -231,7 +231,7 @@ class TestReadHeaders:
             \r\n
         """
         h = self._read(data)
-        assert h.lst == [["Header", "one\r\n two"], ["Header2", "three"]]
+        assert h.lst == [("Header", "one\r\n two"), ("Header2", "three")]
 
     def test_read_continued_err(self):
         data = "\tfoo: bar\r\n"
