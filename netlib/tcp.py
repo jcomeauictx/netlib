@@ -252,10 +252,17 @@ class TCPClient:
                 raise ValueError('TCPClient.convert_to_ssl: sni must be bytes')
             self.connection.set_tlsext_host_name(sni)
         self.connection.set_connect_state()
-        try:
-            self.connection.do_handshake()
-        except SSL.Error as v:
-            raise NetLibError("SSL handshake error: %s"%str(v))
+        while True:
+            try:
+                self.connection.do_handshake()
+                break
+            except SSL.WantReadError:
+                rd, _, _ = select.select([self.connection], [], [],
+                                         DEFAULT_TIMEOUT or 5.0)
+                if not rd:
+                    raise NetLibError("SSL handshake timed out")
+            except SSL.Error as v:
+                raise NetLibError("SSL handshake error: %s"%str(v))
         self.cert = certutils.SSLCert(self.connection.get_peer_certificate())
         self.rfile.set_descriptor(self.connection)
         self.wfile.set_descriptor(self.connection)
