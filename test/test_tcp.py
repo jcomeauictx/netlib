@@ -78,8 +78,6 @@ class TestServer(test.ServerTestBase):
         testval = 'echo!\n'
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
-        if PYTHON2:  # attempt to stop hanging python2 nosetests
-            c.settimeout(1.0)
         c.wfile.write(testval)
         c.wfile.flush()
         seen = c.rfile.readline().decode()
@@ -146,8 +144,6 @@ class TestServerSSL(test.ServerTestBase):
     def test_echo(self):
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
-        if PYTHON2:  # attempt to stop hanging python2 nosetests
-            c.settimeout(1.0)
         c.convert_to_ssl(sni=b'foo.com', options=tcp.OP_ALL)
         testval = 'echo!\n'
         c.wfile.write(testval)
@@ -194,8 +190,6 @@ class TestSSLClientCert(test.ServerTestBase):
     def test_clientcert(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
-        if PYTHON2:  # attempt to stop hanging python2 nosetests
-            c.settimeout(1.0)
         c.convert_to_ssl(cert=tutils.test_data.path(
             "data/clientcert/client.pem")
         )
@@ -225,8 +219,6 @@ class TestSNI(test.ServerTestBase):
         c = tcp.TCPClient("127.0.0.1", self.port)
         logging.debug('TestSNI.test_echo: connecting')
         c.connect()
-        if PYTHON2:  # attempt to stop hanging python2 nosetests
-            c.settimeout(1.0)
         logging.debug('TestSNI.test_echo: convert_to_ssl')
         logging.debug('TestSNI.test_echo: if this is the last'
                       ' TestSNI.test_echo debugging message you see,'
@@ -249,8 +241,6 @@ class TestSSLDisconnect(test.ServerTestBase):
     def test_echo(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
-        if PYTHON2:  # attempt to stop hanging python2 nosetests
-            c.settimeout(1.0)
         c.convert_to_ssl()
         # Excercise SSL.ZeroReturnError
         c.rfile.read(10)
@@ -299,8 +289,6 @@ class TestSSLTimeOut(test.ServerTestBase):
     def test_timeout_client(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
-        if PYTHON2:  # attempt to stop hanging python2 nosetests
-            c.settimeout(1.0)
         c.convert_to_ssl()
         c.settimeout(0.1)
         tutils.raises(tcp.NetLibTimeout, c.rfile.read, 10)
