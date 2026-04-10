@@ -361,6 +361,7 @@ class BaseHandler:
         if request_client_cert:
             def ver(*args):
                 self.clientcert = certutils.SSLCert(args[1])
+                return True
             ctx.set_verify(SSL.VERIFY_PEER, ver)
         self.connection = SSL.Connection(ctx, self.connection)
         self.ssl_established = True
