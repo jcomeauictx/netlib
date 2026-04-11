@@ -255,11 +255,11 @@ def test_read_response():
     data = """
         HTTP/1.1 200 OK
     """
-    assert tst(data) == ((1, 1), 200, 'OK', odict.ODictCaseless(), '')
+    assert tst(data) == ((1, 1), 200, 'OK', odict.ODictCaseless(), b'')
     data = """
         HTTP/1.1 200
     """
-    assert tst(data) == ((1, 1), 200, '', odict.ODictCaseless(), '')
+    assert tst(data) == ((1, 1), 200, '', odict.ODictCaseless(), b'')
     data = """
         HTTP/x 200 OK
     """
@@ -274,7 +274,7 @@ def test_read_response():
 
         HTTP/1.1 200 OK
     """
-    assert tst(data) == ((1, 1), 200, 'OK', odict.ODictCaseless(), '')
+    assert tst(data) == ((1, 1), 200, 'OK', odict.ODictCaseless(), b'')
 
     data = """
         HTTP/1.1 200 OK
@@ -284,7 +284,7 @@ def test_read_response():
     """
     logging.debug('test_read_response: tst(data): %r', tst(data))
     assert tst(data)[4] == b'foo'
-    assert tst(data, 'HEAD')[4] == ''
+    assert tst(data, 'HEAD')[4] == b''
 
     data = """
         HTTP/1.1 200 OK

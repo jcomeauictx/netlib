@@ -193,7 +193,7 @@ class TestSSLClientCert(test.ServerTestBase):
         c.convert_to_ssl(cert=tutils.test_data.path(
             "data/clientcert/client.pem")
         )
-        assert c.rfile.readline().strip() == "1"
+        assert c.rfile.readline().strip() == b"1"
 
     def test_clientcert_err(self):
         c = tcp.TCPClient("127.0.0.1", self.port)
