@@ -429,9 +429,7 @@ def read_response(rfile, method, body_size_limit):
     '''
     return an (httpversion, code, msg, headers, content) tuple.
 
-    expects bytes, and returns bytes
-    FIXME: temporarily reverting to returning strings, to debug
-    server hang on SSL handshake
+    expects bytes, and returns content as bytes
     '''
     endlines = (b'\r\n', b'\n')
     line = rfile.readline()
@@ -450,9 +448,14 @@ def read_response(rfile, method, body_size_limit):
     if headers is None:
         raise HttpError(502, 'Invalid headers.')
     if code >= 100 and code <= 199:
+        # recursive call with no base condition? hmm... (jc)
         return read_response(rfile, method, body_size_limit)
     if method == 'HEAD' or code == 204 or code == 304:
-        content = ''
+        content = b''
     else:
         content = read_http_body_response(rfile, headers, body_size_limit)
+    if not isinstance(content, bytes):
+        logging.error('content beginning %r invalid, converting to bytes',
+                      content[:16])
+        content = content.encode('latin-1')
     return httpversion, code, msg, headers, content
