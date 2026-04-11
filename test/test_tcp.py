@@ -109,7 +109,7 @@ class TestFinishFail(test.ServerTestBase):
     def test_disconnect_in_finish(self):
         c = tcp.TCPClient('127.0.0.1', self.port)
         c.connect()
-        c.settimeout(1.0)
+        c.settimeout(10.0)  # added by jc@unternet.net to prevent hanging
         logging.debug('test_disconnect_in_finish: connected')
         c.wfile.write('foo\n')
         c.wfile.flush()
@@ -174,7 +174,7 @@ class TestSSLv3Only(test.ServerTestBase):
         c = tcp.TCPClient("127.0.0.1", self.port)
         c.connect()
         logging.debug('TestSSLv3Only.test_failure: connected: %s', vars(c))
-        c.settimeout(1.0)
+        c.settimeout(10.0)  # added by jc@unternet.net to prevent hanging
         tutils.raises(tcp.NetLibError, c.convert_to_ssl, sni=b'foo.com', method=tcp.TLSv1_METHOD)
         logging.debug('TestSSLv3Only.test_failure: complete')
 
