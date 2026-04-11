@@ -65,20 +65,20 @@ class TestDummyCert:
             )
             #logging.debug('TestDummyCert.test_with_ca: r: %s', vars(r))
             logging.debug('TestDummyCert.test_with_ca: r.cn: %r', r.cn)
-            assert r.cn == b'foo.com'
+            assert r.cn == 'foo.com'
 
 
 class TestSSLCert:
     def test_simple(self):
         c = certutils.SSLCert.from_pem(file(tutils.test_data.path("data/text_cert"), "rb").read())
-        assert c.cn == b'google.com'
+        assert c.cn == 'google.com'
         #logging.debug('TestSSLCert.test_simple: cert c: %r', vars(c))
         #logging.debug('TestSSLCert.test_simple: cert c: %s', c.altnames)
         assert len(c.altnames) == 436
 
         c = certutils.SSLCert.from_pem(file(tutils.test_data.path(
             "data/text_cert_2"), "rb").read())
-        assert c.cn == b'www.inode.co.nz'
+        assert c.cn == 'www.inode.co.nz'
         assert len(c.altnames) == 2
         assert c.digest(b'sha1')
         assert c.notbefore

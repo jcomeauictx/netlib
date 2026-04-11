@@ -284,7 +284,7 @@ class SSLCert:
         c = None
         for i in self.subject:
             #logging.debug('SSLCert.cn: subject: %r', i)
-            if i[0] == b'CN':
+            if i[0] == 'CN':
                 c = i[1]
         return c
 
