@@ -96,8 +96,8 @@ class TestODict:
         self.od.add("two", "one")
         assert self.od.replace("one", "vun") == 2
         assert self.od.lst == [
-            ["vun", "two"],
-            ["two", "vun"],
+            ("vun", "two"),
+            ("two", "vun"),
         ]
 
     def test_get(self):
