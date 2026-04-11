@@ -166,7 +166,7 @@ class ODict:
             count += c
             v, c = safe_subn(pattern, repl, i[1], *args, **kwargs)
             count += c
-            nlst.append([k, v])
+            nlst.append((k, v))
         self.lst = nlst
         return count
 
