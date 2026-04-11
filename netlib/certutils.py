@@ -258,7 +258,10 @@ class SSLCert:
 
     @property
     def subject(self):
-        return self.x509.get_subject().get_components()
+        return [
+            (k.decode('latin-1'), v.decode('latin-1'))
+            for k, v in self.x509.get_subject().get_components()
+        ]
 
     @property
     def serial(self):
