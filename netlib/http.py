@@ -38,9 +38,11 @@ def _is_valid_host(host):
     '''
     checks validity of host (passed as string)
     '''
+    if not host:
+        return False
     try:
         host.encode().decode('idna')
-    except ValueError:
+    except (ValueError, UnicodeError):
         return False
     if '\0' in host:
         return None
