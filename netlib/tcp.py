@@ -373,11 +373,18 @@ class BaseHandler:
         self.connection = SSL.Connection(ctx, self.connection)
         self.ssl_established = True
         self.connection.set_accept_state()
-        try:
-            logging.debug('BaseHandler.convert_to_ssl: handshaking')
-            self.connection.do_handshake()
-        except SSL.Error as v:
-            raise NetLibError("SSL handshake error: %s" % str(v))
+        logging.debug('BaseHandler.convert_to_ssl: handshaking')
+        while True:
+            try:
+                self.connection.do_handshake()
+                break
+            except SSL.WantReadError:
+                rd, _, _ = select.select([self.connection], [], [],
+                                         DEFAULT_TIMEOUT or 5.0)
+                if not rd:
+                    raise NetLibError("SSL handshake timed out")
+            except SSL.Error as v:
+                raise NetLibError("SSL handshake error: %s" % str(v))
         self.rfile.set_descriptor(self.connection)
         self.wfile.set_descriptor(self.connection)
         logging.debug('BaseHandler.convert_to_ssl: complete')
