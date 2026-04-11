@@ -21,7 +21,7 @@ class ODict:
         A dictionary-like object for managing ordered (key, value) data.
     """
     def __init__(self, lst=None):
-        self.lst = lst or []
+        self.lst = [tuple(i) for i in (lst or [])]
 
     def _kconv(self, s):
         return s
@@ -69,7 +69,7 @@ class ODict:
             raise ValueError("ODict valuelist should be lists.")
         new = self._filter_lst(k, self.lst)
         for i in valuelist:
-            new.append([k, i])
+            new.append((k, i))
         self.lst = new
 
     def __delitem__(self, k):
@@ -85,7 +85,7 @@ class ODict:
         return False
 
     def add(self, key, value):
-        self.lst.append([key, str(value)])
+        self.lst.append((key, str(value)))
 
     def get(self, k, d=None):
         if k in self:
@@ -103,11 +103,11 @@ class ODict:
         return self.lst[:]
 
     def _get_state(self):
-        return [tuple(i) for i in self.lst]
+        return list(self.lst)
 
     @classmethod
     def _from_state(klass, state):
-        return klass([list(i) for i in state])
+        return klass(state)
 
     def copy(self):
         """
