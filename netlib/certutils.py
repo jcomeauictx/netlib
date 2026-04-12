@@ -108,9 +108,12 @@ def dummy_cert(ca, name, sans):
 
         Returns cert path if operation succeeded, None if not.
     """
+    if isinstance(name, bytes):
+        name = name.decode('ascii')
     ss = []
-    # assuming the subject alternate names are provided as strings not bytes
     for i in sans:
+        if isinstance(i, bytes):
+            i = i.decode('ascii')
         ss.append('DNS: %s' % i)
     ss = ', '.join(ss).encode()  # turn it into bytes here
 
