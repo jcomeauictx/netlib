@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import tempfile, os, shutil, logging
 from contextlib import contextmanager
 from libpathod import utils

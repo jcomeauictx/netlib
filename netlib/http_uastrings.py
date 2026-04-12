@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 """
     A small collection of useful user-agent header strings. These should be
     kept reasonably current to reflect common usage.

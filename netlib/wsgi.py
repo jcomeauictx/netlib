@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import urllib, time, traceback
 try:
     from urllib import unquote as urlunquote

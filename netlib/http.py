@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import string, binascii, logging
 try:
     import odict, utils

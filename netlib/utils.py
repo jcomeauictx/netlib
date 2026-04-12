@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # python2/3 compatibility
 
 def isascii(s):
