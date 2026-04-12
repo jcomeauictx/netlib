@@ -11,6 +11,11 @@ except NameError:
     file = open
 
 logging.basicConfig(level=logging.DEBUG if __debug__ else logging.INFO)
+# change logging.debug to logging.quiet when the message has outlived
+# its usefulness, but you might need it again during regression tests
+logging.quiet = lambda msg, *args, **kwargs: logging.log(
+    logging.NOTSET, msg, *args, **kwargs
+)
 
 COMMAND = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 logging.debug('COMMAND: %s', COMMAND)
@@ -193,19 +198,28 @@ class Reader(_FileLike):
         self.add_log(result)
         return result
 
-    def readline(self, size = None):
+    def readline(self, size=None):
         if hasattr(self.o, 'gettimeout'):
             if self.o.gettimeout is None:
                 logging.debug('Reader.readline: setting timeout to %s',
                               DEFAULT_TIMEOUT)
                 self.o.settimeout(DEFAULT_TIMEOUT)
         else:
-            logging.debug('Reader.readline: no timeout possible, may hang')
+            logging.quiet('Reader.readline: no timeout possible, may hang')
         result = b''
         bytes_read = 0
         while True:
-            if size is not None and bytes_read >= size:
-                break
+            try:
+                if size is not None and bytes_read >= size:
+                    break
+            except TypeError:
+                # `size` was being initialized to bytestring:
+                # b'CONNECT 127.0.0.1:43417 HTTP/1.1\r\n'
+                # at line 454 of mitmproxy/libmproxy/proxy.py
+                raise ValueError(
+                    'cannot compare bytes_read %r with size %r' %
+                    (bytes_read, size)
+                )
             try:
                 ch = self.read(1)
             except NetLibDisconnect:
