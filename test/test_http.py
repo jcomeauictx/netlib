@@ -25,26 +25,26 @@ def test_has_chunked_encoding():
 
 
 def test_read_chunked():
-    s = cStringIO.StringIO("1\r\na\r\n0\r\n")
-    tutils.raises("closed prematurely", http.read_chunked, 500, s, None)
+    s = BytesIO(b'1\r\na\r\n0\r\n')
+    tutils.raises('closed prematurely', http.read_chunked, 500, s, None)
 
-    s = cStringIO.StringIO("1\r\na\r\n0\r\n\r\n")
-    assert http.read_chunked(500, s, None) == "a"
+    s = BytesIO(b'1\r\na\r\n0\r\n\r\n')
+    assert http.read_chunked(500, s, None) == b'a'
 
-    s = cStringIO.StringIO("\r\n\r\n1\r\na\r\n0\r\n\r\n")
-    assert http.read_chunked(500, s, None) == "a"
+    s = BytesIO(b'\r\n\r\n1\r\na\r\n0\r\n\r\n')
+    assert http.read_chunked(500, s, None) == b'a'
 
-    s = cStringIO.StringIO("\r\n")
-    tutils.raises("closed prematurely", http.read_chunked, 500, s, None)
+    s = BytesIO(b'\r\n')
+    tutils.raises('closed prematurely', http.read_chunked, 500, s, None)
 
-    s = cStringIO.StringIO("1\r\nfoo")
-    tutils.raises("malformed chunked body", http.read_chunked, 500, s, None)
+    s = BytesIO(b'1\r\nfoo')
+    tutils.raises('malformed chunked body', http.read_chunked, 500, s, None)
 
-    s = cStringIO.StringIO("foo\r\nfoo")
+    s = BytesIO(b'foo\r\nfoo')
     tutils.raises(http.HttpError, http.read_chunked, 500, s, None)
 
-    s = cStringIO.StringIO("5\r\naaaaa\r\n0\r\n\r\n")
-    tutils.raises("too large", http.read_chunked, 500, s, 2)
+    s = BytesIO(b'5\r\naaaaa\r\n0\r\n\r\n')
+    tutils.raises('too large', http.read_chunked, 500, s, 2)
 
 
 def test_request_connection_close():
@@ -106,14 +106,14 @@ def test_read_http_body_request():
     h["expect"] = ["100-continue"]
     r = cStringIO.StringIO("testing")
     w = BytesIO()
-    assert http.read_http_body_request(r, w, h, (1, 1), None) == ""
+    assert http.read_http_body_request(r, w, h, (1, 1), None) == b''
     assert "100 Continue" in w.getvalue().decode()
 
 
 def test_read_http_body():
     h = odict.ODictCaseless()
     s = cStringIO.StringIO("testing")
-    assert http.read_http_body(500, s, h, False, None) == ""
+    assert http.read_http_body(500, s, h, False, None) == b''
 
     h["content-length"] = ["foo"]
     s = cStringIO.StringIO("testing")
