@@ -127,14 +127,14 @@ def read_chunked(code, fp, limit):
 
     May raise HttpError.
     '''
-    content = ''
+    content = b''
     total = 0
     while 1:
         line = fp.readline(128)
         logging.debug('http.read_chunked: pre-content line=%r', line)
-        if line == '':
-            raise HttpErrorConnClosed(code, "Connection closed prematurely")
-        if line not in ('\r\n', '\n'):
+        if line == b'':
+            raise HttpErrorConnClosed(code, 'Connection closed prematurely')
+        if line not in (b'\r\n', b'\n'):
             try:
                 length = int(line, 16)
                 logging.debug('http.read_chunked: chunk length=%d', length)
@@ -159,7 +159,7 @@ def read_chunked(code, fp, limit):
             logging.debug('http.read_chunked: content=%r', content)
             line = fp.readline(5)
             logging.debug('http.read_chunked: post-content endline=%r', line)
-            if line != '\r\n':
+            if line != b'\r\n':
                 raise HttpError(code, 'Malformed chunked body')
     while 1:
         line = fp.readline()
@@ -220,7 +220,7 @@ def read_http_body(code, rfile, headers, all, limit):
     elif all:
         content = rfile.read(limit if limit else -1)
     else:
-        content = ""
+        content = b""
     return content
 
 
