@@ -155,7 +155,8 @@ def read_chunked(code, fp, limit):
                     'chunked content length was at least %s'
                 ) % (limit, total)
                 raise HttpError(code, msg)
-            content += fp.read(length)
+            data = fp.read(length)
+            content += data if isinstance(data, bytes) else data.encode('latin-1')
             logging.debug('http.read_chunked: content=%r', content)
             line = fp.readline(5)
             logging.debug('http.read_chunked: post-content endline=%r', line)
