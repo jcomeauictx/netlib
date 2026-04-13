@@ -5,8 +5,10 @@ except ImportError:
     from urllib.parse import unquote as urlunquote
 try:
     import cStringIO
+    from io import BytesIO
 except ImportError:
     import io as cStringIO  # python3
+    BytesIO = cStringIO.BytesIO
 try:
     import odict
 except ImportError:
@@ -53,7 +55,7 @@ class WSGIAdaptor:
         environ = {
             'wsgi.version':         (1, 0),
             'wsgi.url_scheme':      request.scheme,
-            'wsgi.input':           cStringIO.BytesIO(
+            'wsgi.input':           BytesIO(
                 request.content.encode('latin-1')
                 if isinstance(request.content, str)
                 else (request.content or b'')
