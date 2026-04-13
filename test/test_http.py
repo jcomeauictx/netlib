@@ -132,9 +132,9 @@ def test_read_http_body():
     assert len(http.read_http_body(500, s, h, True, 100)) == 7
 
     h = odict.ODictCaseless()
-    h["transfer-encoding"] = ["chunked"]
-    s = cStringIO.StringIO("5\r\naaaaa\r\n0\r\n\r\n")
-    assert http.read_http_body(500, s, h, True, 100) == "aaaaa"
+    h['transfer-encoding'] = ['chunked']
+    s = BytesIO(b'5\r\naaaaa\r\n0\r\n\r\n')
+    assert http.read_http_body(500, s, h, True, 100) == b'aaaaa'
 
 
 def test_parse_http_protocol():
