@@ -53,7 +53,7 @@ class WSGIAdaptor:
         environ = {
             'wsgi.version':         (1, 0),
             'wsgi.url_scheme':      request.scheme,
-            'wsgi.input':           cStringIO.StringIO(request.content),
+            'wsgi.input':           cStringIO.BytesIO(request.content),
             'wsgi.errors':          errsoc,
             'wsgi.multithread':     True,
             'wsgi.multiprocess':    False,
