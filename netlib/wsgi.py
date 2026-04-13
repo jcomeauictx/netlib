@@ -5,7 +5,7 @@ except ImportError:
     from urllib.parse import unquote as urlunquote
 try:
     import cStringIO
-    from io import BytesIO
+    BytesIO = cStringIO.StringIO  # python2: StringIO handles bytes
 except ImportError:
     import io as cStringIO  # python3
     BytesIO = cStringIO.BytesIO
