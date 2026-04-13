@@ -164,10 +164,10 @@ def read_chunked(code, fp, limit):
     while 1:
         line = fp.readline()
         logging.debug('http.read_chunked: post-content line=%r', line)
-        if line == '':
+        if line == b'':
             logging.debug('http.read_chunked: found "" where eol expected')
             raise HttpErrorConnClosed(code, 'Connection closed prematurely')
-        if line in ('\r\n', '\n'):
+        if line in (b'\r\n', b'\n'):
             logging.debug('http.read_chunked: closing normally')
             break
     return content
