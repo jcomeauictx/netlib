@@ -1,5 +1,5 @@
 from __future__ import print_function
-import select, socket, threading, sys, os, time, traceback, logging
+import select, socket, threading, sys, os, time, traceback, logging, errno
 from OpenSSL import SSL
 try:
     import certutils
@@ -475,7 +475,12 @@ class TCPServer:
                         else:
                             raise  
                 if self.socket in r:
-                    request, client_address = self.socket.accept()
+                    try:
+                        request, client_address = self.socket.accept()
+                    except OSError as ex:
+                        if ex.errno == errno.EBADF:
+                            continue  # iSH spurious wakeup, ignore and retry
+                        raise
                     t = threading.Thread(
                             target = self.request_thread,
                             args = (request, client_address)
