@@ -2,7 +2,7 @@
 SHELL := /bin/sh
 MITMCERT := $(HOME)/.mitmproxy/mitmproxy-ca.pem
 SUBJ ?= /C=AU/ST=Some-State/O=Internet Widgits Pty Ltd
-all: client.see
+all: client.pem
 %.key:
 	# openssl genrsa -out client.key 2048
 	openssl genrsa -out $@ 2048

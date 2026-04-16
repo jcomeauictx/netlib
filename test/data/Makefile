@@ -1,5 +1,5 @@
 SUBJ ?= /C=NZ/ST=Otago/L=Dunedin/O=netlib/OU=netlib/CN=netlib
-all: server.see
+all: server.crt
 %.crt %.key: Makefile
 	openssl req \
 	 -x509 \
