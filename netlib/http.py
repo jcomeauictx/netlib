@@ -231,7 +231,7 @@ def parse_http_protocol(s):
 
     expects a string and returns (major, minor) tuple, or None.
     '''
-    logging.debug('parse_http_protocol: line=%r', s)
+    #logging.debug('parse_http_protocol: line=%r', s)
     if not s.startswith('HTTP/'):
         return None
     _, version = s.split('/', 1)
@@ -276,7 +276,7 @@ def parse_init(line):
     '''
     parse request line and return as strings
     '''
-    logging.debug('parse_init %r', line)
+    #logging.debug('parse_init %r', line)
     try:
         method, url, protocol = line.rstrip().decode().split()
     except ValueError:
